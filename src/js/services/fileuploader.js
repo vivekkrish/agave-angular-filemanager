@@ -1,5 +1,5 @@
 (function(window, angular) {
-    'use strict';
+    "use strict";
     angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', function ($http, $q, fileManagerConfig) {
 
         function deferredHandler(data, deferred, errorMessage) {
@@ -34,18 +34,18 @@
             }
 
             self.requesting = true;
-            $http.post(fileManagerConfig.uploadUrl, form, {
+            $http.post(fileManagerConfig.uploadUrl + '/' + path.join('/'), form, {
                 transformRequest: angular.identity,
                 headers: {
-                    'Content-Type': undefined
+                    "Content-Type": undefined
                 }
             }).success(function(data) {
                 deferredHandler(data, deferred);
             }).error(function(data) {
                 deferredHandler(data, deferred, 'Unknown error uploading files');
-            })['finally'](function() {
+            })['finally'](function(data) {
                 self.requesting = false;
-            });
+            });;
 
             return deferred.promise;
         };

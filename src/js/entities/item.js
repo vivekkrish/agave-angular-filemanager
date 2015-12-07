@@ -1,5 +1,5 @@
 (function(window, angular, $) {
-    'use strict';
+    "use strict";
     angular.module('FileManagerApp').factory('item', ['$http', '$q', '$translate', 'fileManagerConfig', 'chmod', function($http, $q, $translate, fileManagerConfig, Chmod) {
 
         var Item = function(model, path) {
@@ -65,7 +65,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'addfolder',
+                mode: "addfolder",
                 path: self.tempModel.path.join('/'),
                 name: self.tempModel.name
             }};
@@ -76,7 +76,7 @@
                 self.deferredHandler(data, deferred);
             }).error(function(data) {
                 self.deferredHandler(data, deferred, $translate.instant('error_creating_folder'));
-            })['finally'](function() {
+            })['finally'](function(data) {
                 self.inprocess = false;
             });
         
@@ -87,9 +87,9 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'rename',
-                path: self.model.fullPath(),
-                newPath: self.tempModel.fullPath()
+                "mode": "rename",
+                "path": self.model.fullPath(),
+                "newPath": self.tempModel.fullPath()
             }};
             self.inprocess = true;
             self.error = '';
@@ -107,7 +107,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'copy',
+                mode: "copy",
                 path: self.model.fullPath(),
                 newPath: self.tempModel.fullPath()
             }};
@@ -128,7 +128,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'compress',
+                mode: "compress",
                 path: self.model.fullPath(),
                 destination: self.tempModel.fullPath()
             }};
@@ -149,7 +149,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'extract',
+                mode: "extract",
                 path: self.model.fullPath(),
                 sourceFile: self.model.fullPath(),
                 destination: self.tempModel.fullPath()
@@ -161,33 +161,36 @@
                 self.deferredHandler(data, deferred);
             }).error(function(data) {
                 self.deferredHandler(data, deferred, $translate.instant('error_extracting'));
-            })['finally'](function() {
+            })["finally"](function() {
                 self.inprocess = false;
             });
             return deferred.promise;
         };
 
-        Item.prototype.getUrl = function(preview) {
-            var path = this.model.fullPath();
+        Item.prototype.download = function(preview) {
+            var self = this;
             var data = {
-                mode: 'download',
+                mode: "download",
                 preview: preview,
-                path: path
+                path: self.model.fullPath()
             };
-            return path && [fileManagerConfig.downloadFileUrl, $.param(data)].join('?');
+
+            var url = [fileManagerConfig.downloadFileUrl, $.param(data)].join('?');
+            if (self.model.type !== 'dir') {
+                window.open(url, '_blank', '');
+            }
         };
 
-        Item.prototype.download = function(preview) {
-            if (this.model.type !== 'dir') {
-                window.open(this.getUrl(preview), '_blank', '');
-            }
+        Item.prototype.preview = function() {
+            var self = this;
+            return self.download(true);
         };
 
         Item.prototype.getContent = function() {
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'editfile',
+                mode: "editfile",
                 path: self.tempModel.fullPath()
             }};
 
@@ -208,7 +211,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'delete',
+                mode: "delete",
                 path: self.tempModel.fullPath()
             }};
 
@@ -228,7 +231,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'savefile',
+                mode: "savefile",
                 content: self.tempModel.content,
                 path: self.tempModel.fullPath()
             }};
@@ -250,7 +253,7 @@
             var self = this;
             var deferred = $q.defer();
             var data = {params: {
-                mode: 'changepermissions',
+                mode: "changepermissions",
                 path: self.tempModel.fullPath(),
                 perms: self.tempModel.perms.toOctal(),
                 permsCode: self.tempModel.perms.toCode(),

@@ -1,10 +1,12 @@
 (function(window, angular, $) {
-    'use strict';
+    "use strict";
     angular.module('FileManagerApp').controller('FileManagerCtrl', [
-        '$scope', '$translate', '$cookies', 'fileManagerConfig', 'item', 'fileNavigator', 'fileUploader',
-        function($scope, $translate, $cookies, fileManagerConfig, Item, FileNavigator, FileUploader) {
+    '$scope', '$translate', '$cookies', 'fileManagerConfig', 'item', 'fileNavigator', 'fileUploader', 'Commons',
+        function($scope, $translate, $cookies, fileManagerConfig, Item, FileNavigator, FileUploader, Commons) {
 
         $scope.config = fileManagerConfig;
+        $scope.appName = fileManagerConfig.appName;
+
         $scope.reverse = false;
         $scope.predicate = ['model.type', 'model.name'];        
         $scope.order = function(predicate) {
@@ -32,7 +34,7 @@
 
         $scope.touch = function(item) {
             item = item instanceof Item ? item : new Item();
-            item.revert();
+            item.revert && item.revert();
             $scope.temp = item;
         };
 
@@ -41,34 +43,17 @@
                 return $scope.fileNavigator.folderClick(item);
             }
             if (item.isImage()) {
-                return $scope.openImagePreview(item);
+                return item.preview();
             }
             if (item.isEditable()) {
-                return $scope.openEditItem(item);
+                item.getContent();
+                $scope.touch(item);
+                return $scope.modal('edit');
             }
-        };
-
-        $scope.openImagePreview = function(item) {
-            item.inprocess = true;
-            $scope.modal('imagepreview')
-                .find('#imagepreview-target')
-                .attr('src', item.getUrl(true))
-                .unbind('load error')
-                .on('load error', function() {
-                    item.inprocess = false;
-                    $scope.$apply();
-                });
-            return $scope.touch(item);
-        };
-
-        $scope.openEditItem = function(item) {
-            item.getContent();
-            $scope.modal('edit');
-            return $scope.touch(item);
         };
 
         $scope.modal = function(id, hide) {
-            return $('#' + id).modal(hide ? 'hide' : 'show');
+            $('#' + id).modal(hide ? 'hide' : 'show')
         };
 
         $scope.isInThisPath = function(path) {
@@ -153,7 +138,7 @@
                     $scope.modal('newfolder', true);
                 });
             } else {
-                item.error = $translate.instant('error_invalid_filename');
+                $scope.temp.error = $translate.instant('error_invalid_filename');
                 return false;
             }
         };
@@ -170,9 +155,9 @@
 
         $scope.getQueryParam = function(param) {
             var found;
-            window.location.search.substr(1).split('&').forEach(function(item) {
-                if (param ===  item.split('=')[0]) {
-                    found = item.split('=')[1];
+            window.location.search.substr(1).split("&").forEach(function(item) {
+                if (param ===  item.split("=")[0]) {
+                    found = item.split("=")[1];
                     return false;
                 }
             });

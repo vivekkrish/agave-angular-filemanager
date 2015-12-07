@@ -2,13 +2,15 @@
 
 A very smart filemanager to manage your files in the browser developed in AngularJS with Material-Design styles by [Jonas Sciangula Street](https://github.com/joni2back)
 
-[![Build Status](https://travis-ci.org/joni2back/angular-filemanager.svg?branch=master)](https://travis-ci.org/joni2back/angular-filemanager)
-
 #### [Try the DEMO](http://angular-filemanager.zendelsolutions.com/)
 ---------
-![](https://raw.githubusercontent.com/joni2back/angular-filemanager/master/screenshot1.png)
-![](https://raw.githubusercontent.com/joni2back/angular-filemanager/master/screenshot2.png)
-![](https://raw.githubusercontent.com/joni2back/angular-filemanager/master/screenshot3.png)
+
+***Important:*** We need a collaborator to improve the [docs](API.md) !
+
+---------
+![alt tag](https://raw.githubusercontent.com/joni2back/angular-filemanager/master/screenshot1.png)
+![alt tag](https://raw.githubusercontent.com/joni2back/angular-filemanager/master/screenshot2.png)
+![alt tag](https://raw.githubusercontent.com/joni2back/angular-filemanager/master/screenshot3.png)
 
 ### Features
   - Multilanguage (English / Spanish / Portuguese / French)
@@ -27,7 +29,6 @@ A very smart filemanager to manage your files in the browser developed in Angula
   - Drag and drop
   - Dropbox and Google Drive compatibility
   - Extend backend bridges (PHP, Java, Python, Node, .Net)
-  - Migrate jQuery to native or angular.element
 
 ### Backend API
 [Read the docs](API.md)
@@ -49,7 +50,7 @@ A very smart filemanager to manage your files in the browser developed in Angula
   <link rel="stylesheet" href="bower_components/bootswatch/paper/bootstrap.min.css" />
 
 <!-- angular-filemanager -->
-  <link rel="stylesheet" href="dist/angular-filemanager.min.css">
+  <link rel="stylesheet" href="dist/angular-filemanager.css">
   <script src="dist/angular-filemanager.min.js"></script>
 ```
 
@@ -74,13 +75,11 @@ A very smart filemanager to manage your files in the browser developed in Angula
   <script src="src/js/providers/translations.js"></script>
   <script src="src/js/controllers/main.js"></script>
   <script src="src/js/controllers/selector-controller.js"></script>
-  <link href="src/css/animations.css" rel="stylesheet">
-  <link href="src/css/dialogs.css" rel="stylesheet">
-  <link href="src/css/main.css" rel="stylesheet">
+  <link href="src/css/angular-filemanager.css" rel="stylesheet">
 -->
 
 <!-- Comment if you need to use raw source code -->
-  <link href="dist/angular-filemanager.min.css" rel="stylesheet">
+  <link href="dist/angular-filemanager.css" rel="stylesheet">
   <script src="dist/angular-filemanager.min.js"></script>
 <!-- /Comment if you need to use raw source code -->
 ```
@@ -93,7 +92,7 @@ A very smart filemanager to manage your files in the browser developed in Angula
   angular.module('FileManagerApp').config(['fileManagerConfigProvider', function (config) {
     var defaults = config.$get();
     config.set({
-      appName: 'my angular-filemanager',
+      appName: 'github.com/joni2back/angular-filemanager',
       allowedActions: angular.extend(defaults.allowedActions, {
         remove: true
       })
@@ -105,8 +104,8 @@ A very smart filemanager to manage your files in the browser developed in Angula
 ---------
 
 ### Contribute
-To contribute to the project you can simply fork this repo. To build a minified version, you can simply run the Gulp
-task `gulp build`. The minified/uglified files are created in the `dist` folder.
+To contribute to the project you can simply fork this repo. To build a minified version, you can simply run the Gulp 
+task `gulp build`. The minified/uglified files are created in the `dist` folder. 
 
 ### Versioning
 For transparency into our release cycle and in striving to maintain backward compatibility, angular-filemanager is maintained under [the Semantic Versioning guidelines](http://semver.org/).
