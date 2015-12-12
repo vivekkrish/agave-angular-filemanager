@@ -22,9 +22,11 @@
     });
 
     $(window.document).on('contextmenu', '.main-navigation .table-files td:first-child, .iconset a.thumbnail', function(e) {
+        var clickPosition = $(this).position();
+        console.log("right click context menu at: " + clickPosition.x + ',' + clickPosition.y);
         $("#context-menu").hide().css({
-            left: e.pageX,
-            top: e.pageY
+            left: clickPosition.left, //.pageX,
+            top: clickPosition.top + 20 //.pageY
         }).show();
         e.preventDefault();
     });

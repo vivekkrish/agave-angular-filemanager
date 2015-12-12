@@ -5,7 +5,10 @@
     app.directive('angularFilemanager', ['$parse', 'fileManagerConfig', function($parse, fileManagerConfig) {
         return {
             restrict: 'EA',
-            templateUrl: fileManagerConfig.tplPath + '/main.html'
+            templateUrl: fileManagerConfig.tplPath + '/main.html',
+            scope: {
+                system: "=agaveSystem"
+            }
         };
     }]);
 

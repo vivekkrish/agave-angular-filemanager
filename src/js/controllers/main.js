@@ -1,9 +1,8 @@
 (function(window, angular, $) {
     "use strict";
     angular.module('FileManagerApp').controller('FileManagerCtrl', [
-    '$scope', '$translate', '$cookies', 'fileManagerConfig', 'item', 'fileNavigator', 'fileUploader', 'Commons',
-        function($scope, $translate, $cookies, fileManagerConfig, Item, FileNavigator, FileUploader, Commons) {
-
+    '$scope', '$translate', '$cookies', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'Commons',
+        function($scope, $translate, $cookies, fileManagerConfig, fileItem, FileNavigator, FileUploader, Commons) {
         $scope.config = fileManagerConfig;
         $scope.appName = fileManagerConfig.appName;
 
@@ -14,9 +13,11 @@
             $scope.predicate[1] = predicate;
         };
 
+        $scope.system = '';
+        $scope.path = '';
         $scope.query = '';
-        $scope.temp = new Item();
-        $scope.fileNavigator = new FileNavigator();
+        $scope.temp = new fileItem();
+        $scope.fileNavigator = new FileNavigator($scope.system, $scope.path);
         $scope.fileUploader = FileUploader;
         $scope.uploadFileList = [];
         $scope.viewTemplate = $cookies.viewTemplate || 'main-table.html';
@@ -33,7 +34,7 @@
         };
 
         $scope.touch = function(item) {
-            item = item instanceof Item ? item : new Item();
+            item = item instanceof fileItem ? item : new fileItem();
             item.revert && item.revert();
             $scope.temp = item;
         };
@@ -166,6 +167,16 @@
 
         $scope.changeLanguage($scope.getQueryParam('lang'));
         $scope.isWindows = $scope.getQueryParam('server') === 'Windows';
-        $scope.fileNavigator.refresh();
+
+        if ($scope.$parent.$parent.system) {
+            $scope.fileNavigator.refresh();
+        }
+
+        $scope.$watch('$parent.$parent.system', function(val) {
+            $scope.system = val;
+
+            $scope.fileNavigator = new FileNavigator($scope.system, $scope.$parent.$parent.path);
+            $scope.fileNavigator.refresh();
+        });
     }]);
 })(window, angular, jQuery);

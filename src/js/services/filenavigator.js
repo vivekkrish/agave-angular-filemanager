@@ -1,15 +1,41 @@
 (function(angular) {
     "use strict";
     angular.module('FileManagerApp').service('fileNavigator', [
-        '$http', '$q', 'fileManagerConfig', 'FilesController', 'fileItem', function ($http, $q, fileManagerConfig, FilesController, fileItem) {
+        '$http', '$q', 'fileManagerConfig', 'FilesController', 'fileItem', '$localStorage', function ($http, $q, fileManagerConfig, FilesController, fileItem, $localStorage) {
 
-        var FileNavigator = function() {
+        var FileNavigator = function(system, path) {
             this.requesting = false;
             this.fileList = [];
-            this.currentPath = [];
+            this.system = system;
+            // if the system is present, we set the current path or default to the system.storage.homeDir as
+            // an absolute (virtual) path.
+            if (system) {
+                if (path) {
+                    if (path[0] === '/') {
+                        this.currentPath = path.split('/').splice(1);
+                    } else {
+                        this.currentPath = path.split('/');
+                    }
+                } else {
+                    if (system.storage.homeDir[0] === '/') {
+                        this.currentPath = system.storage.homeDir.split('/')[1];
+                    } else {
+                        this.currentPath = system.storage.homeDir.split('/')
+                    }
+                }
+            } else if (path) {
+                if (path[0] === '/') {
+                    this.currentPath = path.split('/').splice(1);
+                } else {
+                    this.currentPath = path.split('/');
+                }
+            } else {
+                this.currentPath = [];
+            }
+
             this.history = [];
             this.error = '';
-            this.systemId = 'data.iplantcollaborative.org';
+
         };
 
         FileNavigator.prototype.deferredHandler = function(data, deferred, defaultMsg) {
@@ -34,38 +60,48 @@
         FileNavigator.prototype.list = function() {
             var self = this;
             var deferred = $q.defer();
-            var path = self.currentPath.join('/');
-
+            var path = '';
             self.requesting = true;
             self.fileList = [];
             self.error = '';
 
-            FilesController.listFileItems(self.systemId, path, 10, 0 )
-                .then(function(data) {
-                    self.deferredHandler(data, deferred);
-                }, function(data) {
-                    self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
-                })['finally'](function(data) {
+            if (!self.system) {
+                return $q(function(resolve, reject) {
+                    setTimeout(function() {
+                        reject("No system selected. Please select a valid system to browse.");
+                    }, 50);
+                });
+            } else {
+                path = self.currentPath.join('/');
+
+                FilesController.listFileItems(self.system.id, path, 10, 0)
+                    .then(function (data) {
+                        console.log(data);
+                        self.deferredHandler(data, deferred);
+                    }, function (data) {
+                        self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
+                    })['finally'](function (data) {
                     self.requesting = false;
                 });
-            //var data = {params: {
-            //    mode: "list",
-            //    onlyFolders: false,
-            //    path: '/' + path
-            //}};
-            //
-            //self.requesting = true;
-            //self.fileList = [];
-            //self.error = '';
-            //
-            //$http.post(fileManagerConfig.listUrl, data).success(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}).error(function(data) {
-            //    self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
-            //})['finally'](function(data) {
-            //    self.requesting = false;
-            //});
-            return deferred.promise;
+                //var data = {params: {
+                //    mode: "list",
+                //    onlyFolders: false,
+                //    path: '/' + path
+                //}};
+                //
+                //self.requesting = true;
+                //self.fileList = [];
+                //self.error = '';
+                //
+                //$http.post(fileManagerConfig.listUrl, data).success(function(data) {
+                //    self.deferredHandler(data, deferred);
+                //}).error(function(data) {
+                //    self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
+                //})['finally'](function(data) {
+                //    self.requesting = false;
+                //});
+                return deferred.promise;
+            }
         };
 
         FileNavigator.prototype.refresh = function() {
@@ -73,9 +109,11 @@
             var path = self.currentPath.join('/');
             
             return self.list().then(function(data) {
-                self.fileList = (data || []).map(function(file) {
-                    return new fileItem(file, self.currentPath, self.systemId);
-                })
+                angular.forEach((data || []), function (file, key) {
+                    if (file.name !== '.' && file.name !== '..' ) {
+                        self.fileList.push(new fileItem(file, self.currentPath, self.system));
+                    }
+                });
                 self.buildTree(path);
             });
         };
@@ -126,6 +164,16 @@
                 self.currentPath = self.currentPath.slice(0, -1);
                 self.refresh();
             }
+        };
+
+        FileNavigator.prototype.goHome = function() {
+            var self = this;
+            if (this.system.storage.homeDir[0] === '/') {
+                this.currentPath = this.system.storage.homeDir.split('/')[1];
+            } else {
+                this.currentPath = this.system.storage.homeDir.split('/')
+            }
+            self.refresh();
         };
 
         FileNavigator.prototype.goTo = function(index) {
