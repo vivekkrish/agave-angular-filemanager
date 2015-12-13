@@ -1,10 +1,36 @@
 (function(window, angular, $) {
     "use strict";
     angular.module('FileManagerApp').controller('FileManagerCtrl', [
-    '$scope', '$translate', '$cookies', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'Commons',
-        function($scope, $translate, $cookies, fileManagerConfig, fileItem, FileNavigator, FileUploader, Commons) {
+    '$scope', '$translate', '$cookies', '$filter', '$ocLazyLoad', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'Commons',
+        function($scope, $translate, $cookies, $filter, $ocLazyLoad, fileManagerConfig, fileItem, FileNavigator, FileUploader, Commons) {
         $scope.config = fileManagerConfig;
         $scope.appName = fileManagerConfig.appName;
+        $scope.modes = ['Javascript', 'Shell', 'XML', 'Markdown', 'CLike', 'Python'];
+        $scope.cmMode = '';
+
+        $scope.cmOptions = {
+            lineWrapping: true,
+            lineNumbers: true,
+            matchBrackets: true,
+            styleActiveLine: false,
+            theme: "solarized",
+            mode: 'shell',
+            onLoad: function (_cm) {
+
+                // HACK to have the codemirror instance in the scope...
+                $scope.modeChanged = function () {
+                    $scope.cmMode = this.cmMode;
+                    _cm.setOption("mode", $scope.cmMode.toLowerCase());
+                    console.log("Changed editor model to " + $scope.cmMode.toLowerCase());
+
+                    // lazy load the plugin for the necessary mode support
+                    $ocLazyLoad.load([
+                        '/bower_components/codemirror/mode/' + $scope.cmMode + "/" + $scope.cmMode + '.js'
+                    ]);
+                };
+            }
+        };
+
 
         $scope.reverse = false;
         $scope.predicate = ['model.type', 'model.name'];        
@@ -16,7 +42,7 @@
         $scope.system = '';
         $scope.path = '';
         $scope.query = '';
-        $scope.temp = new fileItem();
+        $scope.temp = new fileItem(null, null, $scope.system);
         $scope.fileNavigator = new FileNavigator($scope.system, $scope.path);
         $scope.fileUploader = FileUploader;
         $scope.uploadFileList = [];
@@ -34,7 +60,7 @@
         };
 
         $scope.touch = function(item) {
-            item = item instanceof fileItem ? item : new fileItem();
+            item = item instanceof fileItem ? item : new fileItem(null, null, $scope.system);
             item.revert && item.revert();
             $scope.temp = item;
         };
@@ -48,6 +74,9 @@
             }
             if (item.isEditable()) {
                 item.getContent();
+                $scope.cmMode = $filter('codeMirrorEditorMode')(item.model.name);
+
+
                 $scope.touch(item);
                 return $scope.modal('edit');
             }

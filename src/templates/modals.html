@@ -163,20 +163,25 @@
                   <span class="sr-only">{{"close" | translate}}</span>
               </button>
               <button type="button" class="close mr5" ng-click="fullscreen=!fullscreen">
-                  <span>&loz;</span>
+                  <span aria-hidden="true" class="fa fa-{{ fullscreen ? 'expand' : 'compress' }}"></span>
                   <span class="sr-only">{{'toggle_fullscreen' | translate}}</span>
               </button>
               <h4 class="modal-title">{{'edit_file' | translate}}</h4>
             </div>
             <div class="modal-body">
-                <label class="radio">{{'file_content' | translate}}</label>
+
+                <label class="radio">
+                    {{'file_content' | translate}}
+                    <select class="form-input pull-right input-large editorSyntaxSelector clear" ng-model="cmMode" ng-options="m for m in modes" ng-change="modeChanged()"></select>
+                </label>
+
                 <span class="label label-warning" ng-show="temp.inprocess">{{'loading' | translate}} ...</span>
-                <textarea class="form-control code" ng-model="temp.tempModel.content" ng-show="!temp.inprocess" autofocus="autofocus"></textarea>
+                <textarea class="" ui-codemirror ui-codemirror-opts="cmOptions" ng-model="temp.tempModel.content" ng-show="!temp.inprocess" autofocus="autofocus" ui-refresh="temp.inprocess"></textarea>
                 <div ng-include data-src="'error-bar'" class="clearfix"></div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="temp.inprocess">{{"cancel" | translate}}</button>
-              <button type="submit" class="btn btn-primary" ng-disabled="temp.inprocess">{{'edit' | translate}}</button>
+              <button type="submit" class="btn btn-primary" ng-disabled="temp.inprocess">{{'Save' | translate}}</button>
             </div>
         </form>
     </div>
@@ -332,7 +337,7 @@
 </script>
 <script type="text/ng-template" id="error-bar">
     <div class="label label-danger error-msg pull-left animated fadeIn" ng-show="temp.error">
-      <i class="fa fa-times-circle"></i>
+      <i class="glyphicon glyphicon-remove-circle"></i>
       <span>{{temp.error}}</span>
     </div>
 </script>

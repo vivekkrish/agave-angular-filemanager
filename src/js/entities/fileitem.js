@@ -1,6 +1,7 @@
 (function(window, angular, $) {
     "use strict";
-    angular.module('FileManagerApp').factory('fileItem', ['$http', '$q', '$translate', 'fileManagerConfig', 'AccessControlList', 'FilesController', 'PostitsController', 'TransformsController', function($http, $q, $translate, fileManagerConfig, AccessControlList, FilesController, PostitsController, TransformsController) {
+    angular.module('FileManagerApp').factory('fileItem', ['$http', '$q', '$translate', 'fileManagerConfig', 'AccessControlList', 'FilesController', 'FileManagementActionTypeEnum', 'PostitsController', 'TransformsController',
+        function($http, $q, $translate, fileManagerConfig, AccessControlList, FilesController, FileManagementActionTypeEnum, PostitsController, TransformsController) {
 
         var FileItem = function(model, path, system) {
             var rawModel = {
@@ -72,7 +73,7 @@
 
             self.inprocess = true;
             self.error = '';
-            FilesController.updateInvokeFileItemAction(action, self.system.id, self.tempModel.path.join('/'))
+            FilesController.updateInvokeFileItemAction(action, self.tempModel.system.id, self.tempModel.path.join('/'))
                 .then(function(data) {
                     self.deferredHandler(data, deferred);
                 }, function(data) {
@@ -109,7 +110,7 @@
             self.inprocess = true;
             self.error = '';
 
-            FilesController.updateInvokeFileItemAction(action, self.model.systemId, self.model.fullPath())
+            FilesController.updateInvokeFileItemAction(action, self.model.system.id, self.model.fullPath())
                 .then(function(data) {
                     self.deferredHandler(data, deferred);
                 }, function(data) {
@@ -145,7 +146,7 @@
             self.inprocess = true;
             self.error = '';
 
-            FilesController.updateInvokeFileItemAction(action, self.model.systemId, self.model.fullPath())
+            FilesController.updateInvokeFileItemAction(action, self.model.system.id, self.model.fullPath())
                 .then(function(data) {
                     self.deferredHandler(data, deferred);
                 }, function(data) {
@@ -289,10 +290,14 @@
 
             self.inprocess = true;
             self.error = '';
-            FilesController.getDownloadFileItem(self.tempModel.fullPath(), self.model.systemId, false)
+            FilesController.getDownloadFileItem(self.tempModel.fullPath(), self.model.system.id, false)
                 .then(function(data) {
-                    self.tempModel.content = self.model.content = data;
-                    self.deferredHandler(data, deferred);
+                    if (angular.isObject(data)) {
+                        self.tempModel.content = self.model.content = JSON.stringify(data, null, 2);
+                    } else {
+                        self.tempModel.content = self.model.content = data;
+                    }
+                    self.deferredHandler({ result: self.tempModel.content }, deferred);
                 }, function(data) {
                     self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
                 })['finally'](function() {
@@ -324,9 +329,9 @@
 
             self.inprocess = true;
             self.error = '';
-            FilesController.deleteFileItem(self.tempModel.fullPath(), self.model.systemId)
+            FilesController.deleteFileItem(self.tempModel.fullPath(), self.model.system.id)
                 .then(function(data) {
-                    self.deferredHandler(data, deferred);
+                    self.deferredHandler({ result: data ? data: 'Successfully removed object'}, deferred);
                 }, function(data) {
                     self.deferredHandler(data, deferred, $translate.instant('error_deleting'));
                 })['finally'](function() {
@@ -358,6 +363,7 @@
             self.error = '';
             FilesController.uploadBlob(self.tempMode.content, self.tempMode.name, self.tempMode.path.join('/'), false)
                 .then(function(data) {
+
                     self.deferredHandler(data, deferred);
                 }, function(data) {
                     self.deferredHandler(data, deferred, $translate.instant('error_saving_content'));
@@ -391,7 +397,7 @@
 
             self.inprocess = true;
             self.error = '';
-            FilesController.listFileItemPermissions(this.model.systemId, 99999, 0, self.tempModel.fullPath())
+            FilesController.listFileItemPermissions(this.model.system.id, 99999, 0, self.tempModel.fullPath())
                 .then(function(data) {
                     self.deferredHandler(data, deferred);
                 }, function(data) {
@@ -414,7 +420,7 @@
 
             self.inprocess = true;
             self.error = '';
-            FilesController.updateFileItemPermission(newPem, this.model.systemId, self.tempModel.fullPath())
+            FilesController.updateFileItemPermission(newPem, this.model.system.id, self.tempModel.fullPath())
                 .then(function(data) {
                     self.deferredHandler(data, deferred);
                 }, function(data) {
