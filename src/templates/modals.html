@@ -62,12 +62,12 @@
                 </div>
                 <div class="modal-body">
                     <label class="radio">Number of uses </label>
-                    <input type="number" class="form-control" ng-model="temp.postit.maxUses" autofocus="autofocus">
+                    <input type="number" min="1" class="form-control" ng-model="temp.postit.maxUses" autofocus="autofocus">
 
                     <label class="radio">Lifetime</label>
                     <div class="input-group">
                         <!-- Input file -->
-                        <input type="number" class="form-control" ng-model="temp.postit.lifetime">
+                        <input type="number" min="1" class="form-control" ng-model="temp.postit.lifetime">
                         <!-- System selection -->
                         <div class="input-group-btn dropup">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
