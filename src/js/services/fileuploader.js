@@ -1,6 +1,6 @@
 (function(window, angular) {
     "use strict";
-    angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', function ($http, $q, fileManagerConfig) {
+    angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', 'Configuration', function ($http, $q, fileManagerConfig, Configuration) {
 
         function deferredHandler(data, deferred, errorMessage) {
             if (!data || typeof data !== 'object') {
@@ -18,36 +18,56 @@
             deferred.resolve(data);
         }
 
-        this.requesting = false; 
-        this.upload = function(fileList, path) {
+        this.requesting = false;
+
+        this.upload = function(fileList, system, path) {
             if (! window.FormData) {
                 throw new Error('Unsupported browser version');
             }
             var self = this;
-            var form = new window.FormData();
-            var deferred = $q.defer();
-            form.append('destination', '/' + path.join('/'));
 
-            for (var i = 0; i < fileList.length; i++) {
-                var fileObj = fileList.item(i);
-                fileObj instanceof window.File && form.append('file-' + i, fileObj);
-            }
+            var promises = [];
+            var totalUploaded = 0;
 
-            self.requesting = true;
-            $http.post(fileManagerConfig.uploadUrl + '/' + path.join('/'), form, {
-                transformRequest: angular.identity,
-                headers: {
-                    "Content-Type": undefined
+            var promises = angular.forEach(fileList, function (fileObj, key) {
+
+            //});
+            //var promises =  fileList.map(function(fileObj) {
+                var form = new window.FormData();
+                //var fileObj = fileListItem;
+                if (fileObj instanceof window.File) {
+                    form.append('fileToUpload', fileObj);
+                    form.append('append', false);
+                    form.append('fileType', 'raw');
                 }
-            }).success(function(data) {
-                deferredHandler(data, deferred);
-            }).error(function(data) {
-                deferredHandler(data, deferred, 'Unknown error uploading files');
-            })['finally'](function(data) {
-                self.requesting = false;
-            });;
+                self.requesting = true;
+                var filesUri = Configuration.BASEURI + 'files/v2/media/system/' + system.id + '/' + path.join('/') + "?naked=true";
+                promises.push($http.post(filesUri, form, {
+                        transformRequest: angular.identity,
+                        headers: {
+                            "Content-Type": undefined,
+                            "Authorization": "Bearer " + Configuration.oAuthAccessToken
+                        }
+                    }).success(function (data) {
+                        return data;
+                    }).error(function (data) {
+                        return data;
+                    })
+                );
+            });
 
-            return deferred.promise;
+            var deferred = $q.defer();
+
+            return $q.all(promises).then(
+                function(data) {
+                    deferredHandler(data, deferred);
+                },
+                function(data) {
+                    deferredHandler(data, deferred, 'Error uploading files');
+                })
+                ['finally'](function (data) {
+                    self.requesting = false;
+                });
         };
     }]);
 })(window, angular);

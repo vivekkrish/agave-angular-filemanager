@@ -19,6 +19,9 @@
                 fullPath: function() {
                     return ('/' + this.path.join('/') + '/' + this.name).replace(/\/\//, '/');
                 },
+                publicUrl: function() {
+                    return FilesController.getPublicUrlForSystemAndPath(system.id, this.fullPath());
+                },
                 _links: model && model._links,
                 system: system
             };
@@ -254,6 +257,7 @@
 
         FileItem.prototype.download = function(preview) {
             var self = this;
+            var deferred = $q.defer();
 
             var data = {
                 force: "true"

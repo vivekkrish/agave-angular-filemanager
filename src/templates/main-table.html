@@ -1,4 +1,4 @@
-<table class="table mb0 table-files table-striped table-bordered table-hover ">
+<table class="table mb0 table-files table-striped table-bordered table-hover">
     <thead>
         <tr>
             <th>
@@ -46,7 +46,7 @@
         </tr>
         <tr ng-repeat="item in fileNavigator.fileList | filter: query | orderBy:predicate:reverse" ng-show="!fileNavigator.requesting">
             <td ng-right-click="touch(item)">
-                <a href="" ng-click="smartClick(item)" title="{{item.model.name}} ({{item.model.sizeKb()}}kb)">
+                <a href="" ng-click="smartClick(item)" title="{{item.model.name}} ({{item.model.sizeKb()}}kb)" title="{{ item.model.name }}">
                     <i class="fa fa-folder" ng-show="item.model.type === 'dir'"></i>
                     <i class="fa {{ item.model.name | fileIcon }}" ng-show="item.model.type === 'file'"></i>
                     {{item.model.name | strLimit : 64}}

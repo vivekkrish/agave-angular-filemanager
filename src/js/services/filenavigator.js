@@ -72,7 +72,11 @@
                     }, 50);
                 });
             } else {
-                path = self.currentPath.join('/');
+                if (self.currentPath.length) {
+                    path = self.currentPath.join('/');
+                }  else {
+                    path = "";
+                }
 
                 FilesController.listFileItems(self.system.id, path, 10, 0)
                     .then(function (data) {
@@ -168,11 +172,21 @@
 
         FileNavigator.prototype.goHome = function() {
             var self = this;
-            if (this.system.storage.homeDir[0] === '/') {
-                this.currentPath = this.system.storage.homeDir.split('/')[1];
+            console.log("Listing " + self.system.storage.homeDir);
+            if (self.system.storage.homeDir[0] === '/') {
+                self.currentPath = self.system.storage.homeDir.split('/')[1];
             } else {
-                this.currentPath = this.system.storage.homeDir.split('/')
+                self.currentPath = self.system.storage.homeDir.split('/')
             }
+
+            if (self.system.public) {
+                if (self.currentPath.length) {
+                    self.currentPath.push($localStorage.activeProfile.username);
+                } else {
+                    self.currentPath = [$localStorage.activeProfile.username];
+                }
+            }
+
             self.refresh();
         };
 

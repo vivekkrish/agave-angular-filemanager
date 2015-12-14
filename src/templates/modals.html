@@ -49,6 +49,53 @@
   </div>
 </div>
 
+<div class="modal animated fadeIn" id="postit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form ng-submit="rename(temp)">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">{{"close" | translate}}</span>
+                    </button>
+                    <h4 class="modal-title">Create PostIt</h4>
+                </div>
+                <div class="modal-body">
+                    <label class="radio">Number of uses </label>
+                    <input type="number" class="form-control" ng-model="temp.postit.maxUses" autofocus="autofocus">
+
+                    <label class="radio">Lifetime</label>
+                    <div class="input-group">
+                        <!-- Input file -->
+                        <input type="number" class="form-control" ng-model="temp.postit.lifetime">
+                        <!-- System selection -->
+                        <div class="input-group-btn dropup">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
+                            </button>
+                            <ul class="data-system-list dropdown-menu" role="menu">
+                                <li><a href="#">Seconds</a></li>
+                                <li><a href="#">Minutes</a></li>
+                                <li><a href="#">Hours</a></li>
+                                <li><a href="#" class="active">Days</a></li>
+                            </ul>
+                        </div>
+                        <!-- /btn-group -->
+
+                    </div>
+                    <!-- /input-group -->
+
+                    <div ng-include data-src="'postit-bar'" class="clearfix"></div>
+                    <div ng-include data-src="'error-bar'" class="clearfix"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="temp.inprocess">{{"cancel" | translate}}</button>
+                    <button type="submit" class="btn btn-primary" ng-disabled="temp.inprocess">{{'Create' | translate}}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal animated fadeIn" id="copy">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -339,5 +386,32 @@
     <div class="label label-danger error-msg pull-left animated fadeIn" ng-show="temp.error">
       <i class="glyphicon glyphicon-remove-circle"></i>
       <span>{{temp.error}}</span>
+    </div>
+</script>
+
+<script type="text/ng-template" id="postit-bar">
+    <div class="panel panel-primary mt10 mb0">
+        <div class="panel-body">
+            <div class="detail-sources">
+                <code class="mr5"><b>{{"source" | translate}}:</b> {{temp.tempModel._links.self.href}}</code>
+            </div>
+            <div class="detail-sources">
+                <code class="mr5"><b>PostIt URL:</b>{{postit._links.self.href}}</code>
+                <a href="" class="label label-primary" ng-click="openNavigator(temp)">{{'change' | translate}}</a>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="publish-bar">
+    <div class="panel panel-primary mt10 mb0">
+        <div class="panel-body">
+            <div class="detail-sources">
+                <code class="mr5"><b>original:</b> {{temp.tempModel._links.self.href}}</code>
+            </div>
+            <div class="detail-sources">
+                <code class="mr5"><b>public:</b>{{temp.tempModel.publicUrl()}}</code>
+            </div>
+        </div>
     </div>
 </script>

@@ -31,7 +31,9 @@
                 extract: true,
                 download: true,
                 preview: true,
-                remove: true
+                remove: true,
+                postits: true,
+                publish: true
             },
 
             enablePermissionsRecursive: true,
