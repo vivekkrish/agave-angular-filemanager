@@ -1,7 +1,7 @@
 (function(angular) {
     "use strict";
     angular.module('FileManagerApp').service('fileNavigator', [
-        '$http', '$q', 'fileManagerConfig', 'FilesController', 'fileItem', '$localStorage', function ($http, $q, fileManagerConfig, FilesController, fileItem, $localStorage) {
+        '$http', '$q', '$rootScope', 'fileManagerConfig', 'FilesController', 'fileItem', '$localStorage', function ($http, $q, $rootScope, fileManagerConfig, FilesController, fileItem, $localStorage) {
 
         var FileNavigator = function(system, path) {
             this.requesting = false;
@@ -78,7 +78,7 @@
                     path = "";
                 }
 
-                FilesController.listFileItems(self.system.id, path, 10, 0)
+                FilesController.listFileItems(self.system.id, path, 999999, 0)
                     .then(function (data) {
                         console.log(data);
                         self.deferredHandler(data, deferred);
@@ -113,6 +113,7 @@
             var path = self.currentPath.join('/');
             
             return self.list().then(function(data) {
+                $rootScope.$broadcast('af:directory-change', self.system.id, decodeURIComponent(path));
                 angular.forEach((data || []), function (file, key) {
                     if (file.name !== '.' && file.name !== '..' ) {
                         self.fileList.push(new fileItem(file, self.currentPath, self.system));
@@ -159,6 +160,7 @@
             if (item && item.isFolder()) {
                 self.currentPath = item.model.fullPath().split('/').splice(1);
             }
+
             self.refresh();
         };
 

@@ -47,8 +47,8 @@
         <tr ng-repeat="item in fileNavigator.fileList | filter: query | orderBy:predicate:reverse" ng-show="!fileNavigator.requesting">
             <td ng-right-click="touch(item)">
                 <a href="" ng-click="smartClick(item)" title="{{item.model.name}} ({{item.model.sizeKb()}}kb)" title="{{ item.model.name }}">
-                    <i class="fa fa-folder" ng-show="item.model.type === 'dir'"></i>
-                    <i class="fa {{ item.model.name | fileIcon }}" ng-show="item.model.type === 'file'"></i>
+                    <i class="fa fa-folder mr2" ng-show="item.model.type === 'dir'"></i>
+                    <i class="fa {{ item.model.name | fileIcon }} mr2" ng-show="item.model.type === 'file'"></i>
                     {{item.model.name | strLimit : 64}}
                 </a>
             </td>

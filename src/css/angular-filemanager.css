@@ -42,6 +42,19 @@ body {
     background-color: #FAFAFA;
 }
 
+.btn.fullscreen {
+    margin-top:-6px;
+    opacity: .2;
+    background-color: transparent;
+    border: none;
+}
+.btn.fullscreen:hover {
+    opacity: 1;
+    border: none;
+    background-color: transparent;
+}
+
+
 .btn {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
     font-weight: 500;

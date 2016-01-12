@@ -1,8 +1,8 @@
 (function(window, angular, $) {
     "use strict";
     angular.module('FileManagerApp').controller('FileManagerCtrl', [
-    '$scope', '$translate', '$cookies', '$filter', '$ocLazyLoad', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'Commons',
-        function($scope, $translate, $cookies, $filter, $ocLazyLoad, fileManagerConfig, fileItem, FileNavigator, FileUploader, Commons) {
+    '$scope', '$rootScope', '$translate', '$cookies', '$filter', '$ocLazyLoad', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'Commons',
+        function($scope, $rootScope, $translate, $cookies, $filter, $ocLazyLoad, fileManagerConfig, fileItem, FileNavigator, FileUploader, Commons) {
         $scope.config = fileManagerConfig;
         $scope.appName = fileManagerConfig.appName;
         $scope.modes = ['Javascript', 'Shell', 'XML', 'Markdown', 'CLike', 'Python'];
@@ -200,6 +200,17 @@
         if ($scope.$parent.$parent.system) {
             $scope.fileNavigator.refresh();
         }
+
+        $rootScope.$on('af:directory-change', function(event, systemId, newPath) {
+            console.log('Directory changed to agave://' + systemId + "/" + newPath);
+
+            if (newPath) {
+                $scope.$parent.$parent.$state.transitionTo(
+                    'data-explorer',
+                    {systemId: systemId, path: newPath},
+                    {location: true, inherit: true, relative: $scope.$parent.$parent.$state.$current, notify: false})
+            }
+        });
 
         $scope.$watch('$parent.$parent.system', function(val) {
             $scope.system = val;

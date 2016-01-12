@@ -119,7 +119,7 @@
 
             if (extension) {
                 var iconClass = extensionIcons[extension.toLowerCase()];
-                return iconClass ? iconClass : 'fa-file-alt';
+                return iconClass ? iconClass : 'fa-file-o';
             } else {
                 return 'fa-file-o';
             }
