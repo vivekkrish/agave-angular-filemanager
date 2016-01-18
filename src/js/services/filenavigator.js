@@ -80,7 +80,6 @@
 
                 FilesController.listFileItems(self.system.id, path, 999999, 0)
                     .then(function (data) {
-                        console.log(data);
                         self.deferredHandler(data, deferred);
                     }, function (data) {
                         self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
@@ -111,7 +110,7 @@
         FileNavigator.prototype.refresh = function() {
             var self = this;
             var path = self.currentPath.join('/');
-            
+
             return self.list().then(function(data) {
                 $rootScope.$broadcast('af:directory-change', self.system.id, decodeURIComponent(path));
                 angular.forEach((data || []), function (file, key) {

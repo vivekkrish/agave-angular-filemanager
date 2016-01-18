@@ -7,7 +7,8 @@
             restrict: 'EA',
             templateUrl: fileManagerConfig.tplPath + '/main.html',
             scope: {
-                system: "=agaveSystem"
+                system: "=agaveSystem",
+                upload: "@agaveUpload"
             }
         };
     }]);
@@ -39,5 +40,5 @@
             });
         };
     }]);
-    
+
 })(angular);
