@@ -75,7 +75,9 @@
                   // TO-DO: handle error message
               }
               if (item.isEditable()) {
-                  $rootScope.uploadFileContent = item.getContent();
+                  item.getContent().then(function(response){
+                    $rootScope.uploadFileContent = response.result;
+                  });
               }
             } else {
               if (item.isImage()) {
