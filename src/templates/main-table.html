@@ -25,7 +25,7 @@
                     <span class="sortorder" ng-show="predicate[1] === 'model.permissions'" ng-class="{reverse:reverse}"></span>
                 </a>
             </th>
-            <th class="text-right"></th>
+            <th class="text-right" ng-if="!config.allowedActions.agaveUpload"></th>
         </tr>
     </thead>
     <tbody class="file-item">
@@ -61,7 +61,7 @@
             <td class="hidden-sm hidden-xs">
                 {{ item.model.perms.toCode(item.model.type === 'dir'?'d':'-') }}
             </td>
-            <td class="text-right">
+            <td class="text-right" ng-if="!config.allowedActions.agaveUpload">
                 <div ng-include="config.tplPath + '/item-toolbar.html'"></div>
             </td>
         </tr>

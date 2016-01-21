@@ -70,13 +70,20 @@
                 return $scope.fileNavigator.folderClick(item);
             }
 
-            if ($scope.upload === 'true'){
+            if ($scope.config.allowedActions.agaveUpload){
               if (item.isImage()) {
                   // TO-DO: handle error message
               }
               if (item.isEditable()) {
-                  item.getContent().then(function(response){
-                    $rootScope.uploadFileContent = response.result;
+                  $scope.fileNavigator.requesting = true;
+                  item.getContent().then(
+                    function(response){
+                      $rootScope.uploadFileContent = response.result;
+                      $scope.fileNavigator.requesting = false;
+                    },
+                    function(response) {
+                      var errorMsg = response.result && response.result.error || $translate.instant('error_uploading_files');
+                      $scope.temp.error = errorMsg;
                   });
               }
             } else {
@@ -87,12 +94,12 @@
                   item.getContent();
                   $scope.cmMode = $filter('codeMirrorEditorMode')(item.model.name);
 
-
                   $scope.touch(item);
                   return $scope.modal('edit');
               }
             }
         };
+
 
         $scope.modal = function(id, hide) {
             $('#' + id).modal(hide ? 'hide' : 'show')
