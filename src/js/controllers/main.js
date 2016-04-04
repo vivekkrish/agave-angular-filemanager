@@ -220,16 +220,16 @@
             $scope.fileNavigator.refresh();
         }
 
-        // $rootScope.$on('af:directory-change', function(event, systemId, newPath) {
-        //     console.log('Directory changed to agave://' + systemId + "/" + newPath);
-        //
-        //     if (newPath) {
-        //         $scope.$parent.$parent.$state.transitionTo(
-        //             'data-explorer',
-        //             {systemId: systemId, path: newPath},
-        //             {location: true, inherit: true, relative: $scope.$parent.$parent.$state.$current, notify: false})
-        //     }
-        // });
+        $rootScope.$on('af:directory-change', function(event, systemId, newPath) {
+          if ($scope.config.allowedActions.agaveUpload === "false"){
+            if (newPath) {
+                $scope.$parent.$parent.$state.transitionTo(
+                    'data-explorer',
+                    {systemId: systemId, path: newPath},
+                    {location: true, inherit: true, relative: $scope.$parent.$parent.$state.$current, notify: false})
+            }
+          }
+        });
 
         $scope.$watch('$parent.$parent.system', function(val) {
             $scope.system = val;

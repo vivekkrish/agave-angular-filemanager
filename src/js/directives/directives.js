@@ -7,12 +7,12 @@
             restrict: 'EA',
             templateUrl: fileManagerConfig.tplPath + '/main.html',
             scope: {
-                system: "=agaveSystem"
+                system: "=agaveSystem",
+                upload: "=agaveUpload"
             },
             link: function (scope, element, attrs){
-            // Change directive behavior and look for agave file uploads
-            fileManagerConfig.allowedActions.agaveUpload = "agaveUpload" in attrs ? true : fileManagerConfig.allowedActions.agaveUpload;
-          }
+              fileManagerConfig.allowedActions.agaveUpload = attrs.agaveUpload;
+            }
         };
     }]);
 
