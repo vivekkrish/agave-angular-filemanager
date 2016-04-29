@@ -82,6 +82,8 @@
                     .then(function (data) {
                         self.deferredHandler(data, deferred);
                     }, function (data) {
+                        // need to modify angularjs-sdk to return proper messages here
+                        self.error = 'Could not list files for this path';
                         self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
                     })['finally'](function (data) {
                     self.requesting = false;
