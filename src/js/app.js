@@ -6,7 +6,7 @@
 
 (function(window, angular, $) {
     "use strict";
-    var app = angular.module('FileManagerApp', ['pascalprecht.translate', 'ngCookies', 'AgavePlatformScienceAPILib']);
+    var app = angular.module('FileManagerApp', ['pascalprecht.translate', 'ngCookies', 'ngFileUpload', 'AgavePlatformScienceAPILib']);
 
     /**
      * jQuery inits

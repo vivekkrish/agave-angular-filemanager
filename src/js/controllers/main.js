@@ -21,7 +21,7 @@
                 $scope.modeChanged = function () {
                     $scope.cmMode = this.cmMode;
                     _cm.setOption("mode", $scope.cmMode.toLowerCase());
-                    console.log("Changed editor model to " + $scope.cmMode.toLowerCase());
+                    // console.log("Changed editor model to " + $scope.cmMode.toLowerCase());
 
                     // lazy load the plugin for the necessary mode support
                     $ocLazyLoad.load([
@@ -192,9 +192,19 @@
             }
         };
 
+        $scope.addForUpload = function($files) {
+           $scope.uploadFileList = $scope.uploadFileList.concat($files);
+           $scope.modal('uploadfile');
+        };
+
+        $scope.removeFromUpload = function(index) {
+           $scope.uploadFileList.splice(index, 1);
+        };
+
         $scope.uploadFiles = function() {
             $scope.fileUploader.upload($scope.uploadFileList, $scope.system, $scope.fileNavigator.currentPath).then(function() {
                 $scope.fileNavigator.refresh();
+                $scope.uploadFileList = [];
                 $scope.modal('uploadfile', true);
             }, function(data) {
                 var errorMsg = data.result && data.result.error || $translate.instant('error_uploading_files');
