@@ -276,9 +276,14 @@
                 {{"files_will_uploaded_to" | translate}}
                 <b>/{{fileNavigator.currentPath.join('/')}}</b>
               </label>
-              <button class="btn btn-default btn-block" ngf-select="$parent.addForUpload($files)" ngf-multiple="true">
-                {{"select_files" | translate}}
-              </button>
+
+              <div  ngf-drop="$parent.addForUpload($files)"
+                    ngf-select="$parent.addForUpload($files)"
+                    class="drop-box"
+                    ngf-drag-over-class="'dragover'"
+                    ngf-multiple="true">Drop files here or click to upload</div>
+              <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
+
               <div class="upload-list">
                 <ul class="list-group">
                   <li class="list-group-item" ng-repeat="(index, uploadFile) in $parent.uploadFileList">

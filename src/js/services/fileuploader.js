@@ -40,7 +40,7 @@
               return callback(resp.data);
           }, function (resp) {
           }, function (evt) {
-              file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total)) - 1;
+              file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
           });
         }
 
