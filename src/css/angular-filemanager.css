@@ -156,12 +156,6 @@ a:hover {
     }
 }
 
-@media (max-width: 475px) {
-    .table.table-files .btn {
-        display: none;
-    }
-}
-
 .nav-sidebar {
     margin-right: -21px;
     margin-bottom: 20px;

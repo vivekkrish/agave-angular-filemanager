@@ -6,6 +6,7 @@
         var FileNavigator = function(system, path) {
             this.requesting = false;
             this.fileList = [];
+            this.fileListSelected = [];
             this.system = system;
             // if the system is present, we set the current path or default to the system.storage.homeDir as
             // an absolute (virtual) path.
@@ -175,7 +176,6 @@
 
         FileNavigator.prototype.goHome = function() {
             var self = this;
-            console.log("Listing " + self.system.storage.homeDir);
             if (self.system.storage.homeDir[0] === '/') {
                 self.currentPath = self.system.storage.homeDir.split('/')[1];
             } else {

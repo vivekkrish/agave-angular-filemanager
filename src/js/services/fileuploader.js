@@ -1,6 +1,6 @@
 (function(window, angular) {
     "use strict";
-    angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', 'Configuration', 'Upload', function ($http, $q, fileManagerConfig, Configuration, Upload) {
+    angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', 'Configuration', 'Upload', 'PostitsController', function ($http, $q, fileManagerConfig, Configuration, Upload, PostitsController) {
 
         function deferredHandler(data, deferred, errorMessage) {
             if (!data || typeof data !== 'object') {
@@ -89,5 +89,54 @@
             self.requesting = false;
           });
         };
+
+         this.download = function(file, callback) {
+            var data = {
+                force: "true"
+            };
+            
+            var postitIt = new PostItRequest();
+            postitIt.setMaxUses(2);
+            postitIt.setMethod("GET");
+            postitIt.setUrl([file.model._links.self.href, $.param(data)].join('?'));
+
+            return PostitsController.addPostit(postitIt)
+                .then(function(resp) {
+                    if (file.model.type !== 'dir') {
+                      var link = document.createElement('a');
+                      link.setAttribute('download', null);
+                      link.setAttribute('href', resp._links.self.href);
+                      link.style.display = 'none';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                    return callback(resp.data);
+                });
+        };
+
+        this.downloadSelected = function(fileListSelected){
+          var self = this;
+          var promises = [];
+
+          angular.forEach(fileListSelected, function(file){
+            promises.push(
+              self.download(file, function(value){
+                self.files.push(value);
+              })
+            );
+          });
+
+          var deferred = $q.defer();
+
+          return $q.all(promises).then(
+            function(data) {
+              deferredHandler(data, deferred);
+            },
+            function(data) {
+              deferredHandler(data, deferred, 'Error downloading files');
+          });
+        };
+
     }]);
 })(window, angular);

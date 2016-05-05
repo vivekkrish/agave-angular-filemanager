@@ -6,7 +6,12 @@
 
 (function(window, angular, $) {
     "use strict";
-    var app = angular.module('FileManagerApp', ['pascalprecht.translate', 'ngCookies', 'ngFileUpload', 'AgavePlatformScienceAPILib']);
+    var app = angular.module('FileManagerApp', [
+      'pascalprecht.translate',
+      'ngCookies',
+      'ngFileUpload',
+      'checklist-model',
+      'AgavePlatformScienceAPILib']);
 
     /**
      * jQuery inits
@@ -21,7 +26,7 @@
         $("#context-menu").hide();
     });
 
-    $(window.document).on('contextmenu', '.main-navigation .table-files td:first-child, .iconset a.thumbnail', function(e) {
+    $(window.document).on('contextmenu', '.main-navigation .table-files td:nth-child(2), .iconset a.thumbnail', function(e) {
         var clickPosition = $(this).position();
         console.log("right click context menu at: " + clickPosition.x + ',' + clickPosition.y);
         $("#context-menu").hide().css({

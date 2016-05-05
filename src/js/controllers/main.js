@@ -70,7 +70,7 @@
                 return $scope.fileNavigator.folderClick(item);
             }
 
-            if ($scope.config.allowedActions.agaveUpload){
+            if ($scope.config.allowedActions.agaveUpload === "true"){
               if (item.isImage()) {
                   // TO-DO: handle error message
               }
@@ -211,6 +211,29 @@
                 $scope.temp.error = errorMsg;
             });
         };
+
+        $scope.checkAllFiles = function(checkAll){
+          if (checkAll){
+            $scope.fileNavigator.fileListSelected = $scope.fileNavigator.fileList.filter(function(file){
+              if (file.model.type !== "dir"){
+                return file;
+              }
+            });
+          } else {
+            $scope.fileNavigator.fileListSelected = [];
+          }
+        }
+
+        $scope.downloadFiles = function(fileListSelected){
+          $scope.fileUploader.downloadSelected(fileListSelected).then(function() {
+              $scope.fileNavigator.refresh();
+              $scope.uploadFileList = [];
+              $scope.modal('uploadfile', true);
+          }, function(data) {
+              var errorMsg = data.result && data.result.error || $translate.instant('error_downloading_files');
+              $scope.temp.error = errorMsg;
+          });
+        }
 
         $scope.getQueryParam = function(param) {
             var found;
