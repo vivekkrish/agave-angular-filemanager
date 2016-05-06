@@ -72,6 +72,8 @@
             error_getting_content: "An error occurred getting the content of the file",
             error_changing_perms: "An error occurred changing the permissions of the file",
             error_uploading_files: "An error occurred uploading files",
+            error_downloading_files: "An error occurred downloading files",
+            error_deleting_files: "An error occurred deleting files",
             sure_to_start_compression_with: "Are you sure to compress",
             owner: "Owner",
             group: "Group",

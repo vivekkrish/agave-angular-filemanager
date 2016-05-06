@@ -227,10 +227,19 @@
         $scope.downloadFiles = function(fileListSelected){
           $scope.fileUploader.downloadSelected(fileListSelected).then(function() {
               $scope.fileNavigator.refresh();
-              $scope.uploadFileList = [];
               $scope.modal('uploadfile', true);
           }, function(data) {
               var errorMsg = data.result && data.result.error || $translate.instant('error_downloading_files');
+              $scope.temp.error = errorMsg;
+          });
+        }
+
+        $scope.deleteFiles = function(fileListSelected){
+          $scope.fileUploader.deleteSelected(fileListSelected).then(function() {
+              $scope.fileNavigator.refresh();
+              $scope.modal('uploadfile', true);
+          }, function(data) {
+              var errorMsg = data.result && data.result.error || $translate.instant('error_deleting_files');
               $scope.temp.error = errorMsg;
           });
         }

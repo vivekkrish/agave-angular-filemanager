@@ -1,6 +1,6 @@
 (function(window, angular) {
     "use strict";
-    angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', 'Configuration', 'Upload', 'PostitsController', function ($http, $q, fileManagerConfig, Configuration, Upload, PostitsController) {
+    angular.module('FileManagerApp').service('fileUploader', ['$http', '$q', 'fileManagerConfig', 'Configuration', 'Upload', 'PostitsController', 'FilesController', function ($http, $q, fileManagerConfig, Configuration, Upload, PostitsController, FilesController) {
 
         function deferredHandler(data, deferred, errorMessage) {
             if (!data || typeof data !== 'object') {
@@ -90,11 +90,11 @@
           });
         };
 
-         this.download = function(file, callback) {
+        this.download = function(file, callback) {
             var data = {
                 force: "true"
             };
-            
+
             var postitIt = new PostItRequest();
             postitIt.setMaxUses(2);
             postitIt.setMethod("GET");
@@ -135,6 +135,42 @@
             },
             function(data) {
               deferredHandler(data, deferred, 'Error downloading files');
+          });
+        };
+
+        this.delete = function(file, callback) {
+            if (file.model.path && file.model.name){
+              var path = file.model.path.join('/') + '/' + file.model.name;
+              var systemId = file.model.system.id;
+              return FilesController.deleteFileItem(path, systemId)
+                .then(
+                  function(resp){
+                    return callback(resp.data);
+                  }
+                );
+            }
+        };
+
+        this.deleteSelected = function(fileListSelected){
+          var self = this;
+          var promises = [];
+
+          angular.forEach(fileListSelected, function(file){
+            promises.push(
+              self.delete(file, function(value){
+                self.files.push(value);
+              })
+            );
+          });
+
+          var deferred = $q.defer();
+
+          return $q.all(promises).then(
+            function(data) {
+              deferredHandler(data, deferred);
+            },
+            function(data) {
+              deferredHandler(data, deferred, 'Error deleting files');
           });
         };
 
