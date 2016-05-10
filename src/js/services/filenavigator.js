@@ -172,22 +172,22 @@
             }
         };
 
-         FileNavigator.prototype.sidebarFolderClick = function(item) {
-            var self = this;
-            if (typeof item.item === 'undefined'){
-              self.currentPath = [];
-              self.currentPath.push(item.item.name);
-            } else {
-
-              self.currentPath = [];
-              if (item && item.item.isFolder()) {
-                  self.currentPath = item.item.model.fullPath().split('/').splice(1);
-                  self.crumbsPath = item.item.model.crumbsPath().splice(1);
-              }
-            }
-
-            self.refresh();
-        };
+        //  FileNavigator.prototype.sidebarFolderClick = function(item) {
+        //     var self = this;
+        //     if (typeof item.item === 'undefined'){
+        //       self.currentPath = [];
+        //       self.currentPath.push(item.item.name);
+        //     } else {
+        //
+        //       self.currentPath = [];
+        //       if (item && item.item.isFolder()) {
+        //           self.currentPath = item.item.model.fullPath().split('/').splice(1);
+        //           self.crumbsPath = item.item.model.crumbsPath().splice(1);
+        //       }
+        //     }
+        //
+        //     self.refresh();
+        // };
 
         FileNavigator.prototype.folderClick = function(item) {
             var self = this;
