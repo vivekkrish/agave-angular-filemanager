@@ -8,6 +8,7 @@
             this.fileList = [];
             this.fileListSelected = [];
             this.system = system;
+            this.crumbsPath = '';
             // if the system is present, we set the current path or default to the system.storage.homeDir as
             // an absolute (virtual) path.
             if (system) {
@@ -121,6 +122,13 @@
                         self.fileList.push(new fileItem(file, self.currentPath, self.system));
                     }
                 });
+                if (!self.crumbsPath){
+                  if(self.fileList.length > 0){
+                      self.crumbsPath = self.fileList[0].model.crumbsPath().slice(0, -1).splice(1);
+                  } else {
+                      self.crumbsPath = self.currentPath;
+                  }
+                }
                 self.buildTree(path);
             });
         };
@@ -149,18 +157,50 @@
                 });
             };
 
-            !self.history.length && self.history.push({name: path, nodes: []});
+            if (self.history.length){
+              if (self.history[0].name !== "") {
+              self.history = [];
+                self.history.push({name: path, nodes: []})
+              }
+            } else {
+              self.history.push({name: path, nodes: []});
+            }
+
             for (var o in self.fileList) {
                 var item = self.fileList[o];
                 item.isFolder() && recursive(self.history[0], item, path);
             }
         };
 
+         FileNavigator.prototype.sidebarFolderClick = function(item) {
+            var self = this;
+            if (typeof item.item === 'undefined'){
+              self.currentPath = [];
+              self.currentPath.push(item.item.name);
+            } else {
+
+              self.currentPath = [];
+              if (item && item.item.isFolder()) {
+                  self.currentPath = item.item.model.fullPath().split('/').splice(1);
+                  self.crumbsPath = item.item.model.crumbsPath().splice(1);
+              }
+            }
+
+            self.refresh();
+        };
+
         FileNavigator.prototype.folderClick = function(item) {
             var self = this;
-            self.currentPath = [];
-            if (item && item.isFolder()) {
-                self.currentPath = item.model.fullPath().split('/').splice(1);
+            if (typeof item === 'undefined'){
+              self.currentPath = [];
+              self.currentPath.push(item.name);
+            } else {
+
+              self.currentPath = [];
+              if (item && item.isFolder()) {
+                  self.currentPath = item.model.fullPath().split('/').splice(1);
+                  self.crumbsPath = item.model.crumbsPath().splice(1);
+              }
             }
 
             self.refresh();
@@ -170,6 +210,7 @@
             var self = this;
             if (self.currentPath[0]) {
                 self.currentPath = self.currentPath.slice(0, -1);
+                self.crumbsPath = self.crumbsPath.slice(0, -1);
                 self.refresh();
             }
         };
@@ -196,6 +237,7 @@
         FileNavigator.prototype.goTo = function(index) {
             var self = this;
             self.currentPath = self.currentPath.slice(0, index + 1);
+            self.crumbsPath = self.crumbsPath.slice(0, index + 1);
             self.refresh();
         };
 

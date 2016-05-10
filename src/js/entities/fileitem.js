@@ -17,10 +17,16 @@
                     return Math.round(this.size / 1024, 1);
                 },
                 fullPath: function() {
-                    return ('/' + this.path.join('/') + '/' + this.name).replace(/\/\//, '/');
+                    if (this.path.length == 1 && this.path[0] === '/'){
+                        return ('/' + this.name).replace(/\/\//g, '/');
+                    }
+                        return ('/' + this.path.join('/') + '/' + this.name).replace(/\/\//g, '/');
                 },
-                publicUrl: function() {
-                    return FilesController.getPublicUrlForSystemAndPath(system.id, this.fullPath());
+                crumbsPath: function(){
+                    //There's the possiblitiy that this does extra replaces.
+                    //TODO: Use regular expressions or return this path from the server.
+                    var fullPath = this.fullPath().split('/');
+                    return fullPath;
                 },
                 _links: model && model._links,
                 system: system
@@ -441,7 +447,7 @@
             //    permsCode: self.tempModel.perms.toCode(),
             //    recursive: self.tempModel.recursive
             //}};
-            
+
             //self.inprocess = true;
             //self.error = '';
             //$http.post(fileManagerConfig.permissionsUrl, data).then(function(data) {

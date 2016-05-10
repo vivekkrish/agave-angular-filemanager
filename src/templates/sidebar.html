@@ -3,7 +3,7 @@
 </ul>
 
 <script type="text/ng-template" id="folder-branch-item">
-    <a href="" ng-click="fileNavigator.folderClick(item.item)" class="animated fast fadeInDown" title="{{ (item.name.split('/').pop() || '/') }}">
+    <a href="" ng-click="fileNavigator.sidebarFolderClick(item)" class="animated fast fadeInDown" title="{{ (item.name.split('/').pop() || '/') }}">
         <i class="fa fa-folder mr2" ng-hide="isInThisPath(item.name)"></i>
         <i class="fa fa-folder-open mr2"  ng-show="isInThisPath(item.name)"></i>
         {{ (item.name.split('/').pop() || '/') | strLimit : 14 }}
