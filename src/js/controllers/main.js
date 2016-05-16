@@ -117,9 +117,12 @@
         };
 
         $scope.changePermissions = function(item) {
-            item.changePermissions().then(function() {
-                $scope.modal('changepermissions', true);
-            });
+            item.changePermissions()
+              .then(
+                function(data) {
+                  $scope.modal('changepermissions', true);
+                }
+            );
         };
 
         $scope.copy = function(item) {

@@ -10,7 +10,7 @@
         <li class="divider"></li>
         <li ng-show="config.allowedActions.publish"><a href="" tabindex="-1" data-toggle="modal" data-target="#publish"><i class="fa fa-globe"></i> Publish </a></li>
         <li ng-show="config.allowedActions.postits && !temp.isFolder()"><a href="" tabindex="-1" data-toggle="modal" data-target="#postit"><i class="fa fa-link"></i> Get Link</a></li>
-        <li ng-show="config.allowedActions.changePermissions"><a href="" tabindex="-1" data-toggle="modal" data-target="#changepermissions"><i class="fa fa-lock"></i> {{'permissions' | translate}}</a></li>
+        <li ng-show="config.allowedActions.changePermissions"><a href="" tabindex="-1" data-toggle="modal" data-target="#changepermissions" ng-click="temp.agaveFilePermissions()"><i class="fa fa-lock"></i> {{'permissions' | translate}}</a></li>
         <li class="divider"></li>
         <li ng-show="config.allowedActions.remove"><a href="" tabindex="-1" data-toggle="modal" data-target="#delete"><i class="fa fa-trash"></i> {{'remove' | translate}}</a></li>
     </ul>

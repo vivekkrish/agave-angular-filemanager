@@ -81,9 +81,11 @@
             read: "Read",
             write: "Write",
             exec: "Exec",
+            execute: "Execute",
             original: "Original",
             changes: "Changes",
-            recursive: "Recursive"
+            recursive: "Recursive",
+            user: "User"
         });
 
         $translateProvider.translations('pt', {

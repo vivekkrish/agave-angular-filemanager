@@ -315,57 +315,115 @@
 </div>
 
 <div class="modal animated fadeIn" id="changepermissions">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-        <form ng-submit="changePermissions(temp)">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">
-                  <span aria-hidden="true">&times;</span>
-                  <span class="sr-only">{{"close" | translate}}</span>
-              </button>
-              <h4 class="modal-title">{{'change_permissions' | translate}}</h4>
+      <form ng-submit="changePermissions(temp)">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">{{"close" | translate}}</span>
+          </button>
+          <h4 class="modal-title">{{'change_permissions' | translate}}</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row" ng-show="temp.inprocess">
+            <div ng-include="config.tplPath + '/spinner.html'"></div>
+          </div>
+          <div class="row" ng-show="!temp.inprocess">
+            <div class="col-md-6 text-center">
+              <span class="label label-primary">{{'original' | translate}}</span>
+              <div class="table-responsive">
+                <table class="table">
+                <thead>
+                  <tr>
+                    <th class="col-xs-1 text-center">{{'user' | translate}}</th>
+                    <th class="col-xs-1 text-center">{{'execute' | translate}}</th>
+                    <th class="col-xs-1 text-center">{{'read' | translate}}</th>
+                    <th class="col-xs-1 text-center">{{'write' | translate}}</th>
+                    <th class="col-xs-1 text-center" ng-if="temp.model.type === 'dir'">{{'recursive' | translate}}</th>
+                  </tr>
+                </thead>
+                  <tbody>
+                  <tr ng-repeat="(permTypeKey, permTypeValue) in temp.model.perms">
+                    <td>
+                    {{permTypeKey | translate}}
+                    </td>
+                    <td class="col-xs-1">
+                    <label class="col-xs-12">
+                      <input type="checkbox" ng-model="temp.model.perms[permTypeKey]['execute']" ng-checked="temp.model.perms[permTypeKey]['execute']" disabled>
+                    </label>
+                    </td>
+                    <td class="col-xs-1">
+                      <label class="col-xs-12">
+                      <input type="checkbox" ng-model="temp.model.perms[permTypeKey]['read']" ng-checked="temp.model.perms[permTypeKey]['read']" disabled>
+                      </label>
+                    </td>
+                    <td class="col-xs-1">
+                      <label class="col-xs-12">
+                      <input type="checkbox" ng-model="temp.model.perms[permTypeKey]['write']" ng-checked="temp.model.perms[permTypeKey]['write']" disabled>
+                      </label>
+                    </td>
+                    <td class="col-xs-1" ng-if="temp.model.type === 'dir'">
+                      <label class="col-xs-12">
+                      <input type="checkbox" ng-model="temp.model.perms[permTypeKey]['recursive']" ng-checked="temp.model.perms[permTypeKey]['recursive']" disabled>
+                      </label>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div class="modal-body">
-              <table class="table mb0">
+            <div class="col-md-6 text-center">
+              <span class="label label-primary text-center">{{'changes' | translate}}</span>
+              <div class="table-responsive">
+                <table class="table">
                   <thead>
-                      <tr>
-                          <th>{{'permissions' | translate}}</th>
-                          <th class="col-xs-1 text-center">{{'exec' | translate}}</th>
-                          <th class="col-xs-1 text-center">{{'read' | translate}}</th>
-                          <th class="col-xs-1 text-center">{{'write' | translate}}</th>
-                      </tr>
+                    <tr>
+                      <th class="col-xs-1 text-center">{{'user' | translate}}</th>
+                      <th class="col-xs-1 text-center">{{'execute' | translate}}</th>
+                      <th class="col-xs-1 text-center">{{'read' | translate}}</th>
+                      <th class="col-xs-1 text-center">{{'write' | translate}}</th>
+                      <th class="col-xs-1 text-center" ng-if="temp.tempModel.type === 'dir'">{{'recursive' | translate}}</th>
+                    </tr>
                   </thead>
                   <tbody>
-                      <tr ng-repeat="(permTypeKey, permTypeValue) in temp.tempModel.perms">
-                          <td>{{permTypeKey | translate}}</td>
-                          <td ng-repeat="(permKey, permValue) in permTypeValue" class="col-xs-1 text-center" ng-click="main()">
-                              <label class="col-xs-12">
-                                <input type="checkbox" ng-model="temp.tempModel.perms[permTypeKey][permKey]">
-                              </label>
-                          </td>
-                      </tr>
-                </tbody>
-              </table>
-              <div class="checkbox" ng-show="config.denablePermissionsRecursive && temp.model.type === 'dir'">
-                <label>
-                  <input type="checkbox" ng-model="temp.tempModel.recursive"> {{'recursive' | translate}}
-                </label>
+                    <tr ng-repeat="(permTypeKey, permTypeValue) in temp.tempModel.perms">
+                      <td>
+                      {{permTypeKey | translate}}
+                      </td>
+                      <td class="col-xs-1">
+                        <label class="col-xs-12">
+                        <input type="checkbox" ng-model="temp.tempModel.perms[permTypeKey]['execute']" ng-checked="temp.tempModel.perms[permTypeKey]['execute']">
+                        </label>
+                      </td>
+                      <td class="col-xs-1">
+                        <label class="col-xs-12">
+                        <input type="checkbox" ng-model="temp.tempModel.perms[permTypeKey]['read']" ng-checked="temp.tempModel.perms[permTypeKey]['read']">
+                        </label>
+                      </td>
+                      <td class="col-xs-1">
+                        <label class="col-xs-12">
+                        <input type="checkbox" ng-model="temp.tempModel.perms[permTypeKey]['write']" ng-checked="temp.tempModel.perms[permTypeKey]['write']">
+                        </label>
+                      </td>
+                      <td class="col-xs-1" ng-if="temp.model.type === 'dir'">
+                        <label class="col-xs-12">
+                        <input type="checkbox" ng-model="temp.tempModel.perms[permTypeKey]['recursive']" ng-checked="temp.tempModel.perms[permTypeKey]['recursive']">
+                        </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div class="clearfix mt10">
-                  <span class="label label-primary pull-left">
-                    {{'original' | translate}}: {{temp.model.perms.toCode(temp.model.type === 'dir'?'d':'-')}} ({{temp.model.perms.toOctal()}})
-                  </span>
-                  <span class="label label-primary pull-right">
-                    {{'changes' | translate}}: {{temp.tempModel.perms.toCode(temp.model.type === 'dir'?'d':'-')}} ({{temp.tempModel.perms.toOctal()}})
-                  </span>
-              </div>
-              <div ng-include data-src="'error-bar'" class="clearfix"></div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">{{"cancel" | translate}}</button>
-              <button type="submit" class="btn btn-primary" ng-disabled="">{{'change' | translate}}</button>
-            </div>
-        </form>
+          </div>
+          <div ng-include data-src="'error-bar'" class="clearfix"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{"cancel" | translate}}</button>
+          <button type="submit" class="btn btn-primary" ng-disabled="">{{'change' | translate}}</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 (function(window, angular, $) {
     "use strict";
-    angular.module('FileManagerApp').factory('fileItem', ['$http', '$q', '$translate', 'fileManagerConfig', 'AccessControlList', 'FilesController', 'FileManagementActionTypeEnum', 'PostitsController', 'TransformsController',
-        function($http, $q, $translate, fileManagerConfig, AccessControlList, FilesController, FileManagementActionTypeEnum, PostitsController, TransformsController) {
+    angular.module('FileManagerApp').factory('fileItem', ['$http', '$q', '$translate', '$localStorage', 'fileManagerConfig', 'AccessControlList', 'FilesController', 'FileManagementActionTypeEnum', 'PostitsController', 'TransformsController',
+        function($http, $q, $translate, $localStorage, fileManagerConfig, AccessControlList, FilesController, FileManagementActionTypeEnum, PostitsController, TransformsController) {
 
         var FileItem = function(model, path, system) {
             var rawModel = {
@@ -10,7 +10,7 @@
                 type: model && model.type || 'file',
                 size: model && parseInt(model.length || 0),
                 date: model && model.lastModified,
-                perms: new AccessControlList(model && model.permissions),
+                perms: this.agaveFilePermission(model && model.permissions),
                 content: model && model.content || '',
                 recursive: false,
                 sizeKb: function() {
@@ -42,6 +42,188 @@
                 var d = (mysqlDate || '').toString().split(/[- :]/);
                 return new Date(d[0], d[1] - 1, d[2], d[3], d[4], d[5]);
             }
+        };
+
+        // ACLs
+         FileItem.prototype.getRwxObj = function() {
+            return {
+                  read: false,
+                  write: false,
+                  execute: false,
+                  recursive: false,
+            };
+        };
+
+        FileItem.prototype.transformRwxToAgave = function(rwxObj) {
+          var result = '';
+          if (rwxObj.read === true && rwxObj.write === true && rwxObj.execute === true){
+            result = 'ALL';
+          }
+          else if (rwxObj.read = true && rwxObj.write === false && rwxObj.execute === false){
+            result = 'READ';
+          }
+          else if (rwxObj.read = false && rwxObj.write === true && rwxObj.execute === false) {
+            result = 'WRITE';
+          }
+          else if (rwxObj.read = false && rwxObj.write === false && rwxObj.execute === true) {
+            result = 'EXECUTE';
+          }
+          else if (rwxObj.read = true && rwxObj.write === true && rwxObj.execute === false) {
+            result = 'READ_WRITE';
+          }
+          else if (rwxObj.read = true && rwxObj.write === false && rwxObj.execute === true) {
+            result = 'READ_EXECUTE';
+          }
+          else if (rwxObj.read = false && rwxObj.write === true && rwxObj.execute === true) {
+            result = 'WRITE_EXECUTE';
+          }
+          else {
+            result = 'EXECUTE';
+          }
+          return result;
+        };
+
+        FileItem.prototype.transformAgaveToRwx = function(agavePermission) {
+            var rwxObj = this.getRwxObj();
+
+            switch(agavePermission){
+                case "ALL":
+                    rwxObj.read = true;
+                    rwxObj.write = true;
+                    rwxObj.execute = true;
+                  break;
+                case "READ":
+                    rwxObj.read = true;
+                  break;
+                case "WRITE":
+                    rwxObj.write = true;
+                  break;
+                case "EXECUTE":
+                    rwxObj.execute = true;
+                  break;
+                case "READ_WRITE":
+                    rwxObj.read = true;
+                    rwxObj.write = true;
+                  break;
+                case "READ_EXECUTE":
+                    rwxObj.read = true;
+                    rwxObj.execute = true;
+                  break;
+                case "WRITE_EXECUTE":
+                    rwxObj.write = true;
+                    rwxObj.execute = true;
+                  break;
+                case "EXECUTE":
+                    rwxObj.execute = true;
+                  break;
+            }
+
+            return rwxObj;
+        };
+
+        FileItem.prototype.changePermissions = function() {
+          var self = this;
+          var deferred = $q.defer();
+
+          var newPem = new FilePermissionRequest();
+          newPem.setUsername(self.tempModel.username);
+          newPem.setPermission(self.tempModel.perms);
+          newPem.setRecursive(self.tempModel.type === 'file' && self.tempModel.perms.recursive);
+
+          self.inprocess = true;
+          self.error = '';
+          FilesController.updateFileItemPermission(newPem, this.model.system.id, self.tempModel.fullPath())
+              .then(function(data) {
+                  self.deferredHandler(data, deferred);
+              }, function(data) {
+                  self.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+              })['finally'](function() {
+                  self.inprocess = false;
+              });
+          return deferred.promise;
+        };
+
+        // permissions for single user
+        FileItem.prototype.agaveFilePermission = function (agavePermission) {
+          var pems = {};
+          var username = $localStorage.activeProfile.username;
+          pems[username] = this.transformAgaveToRwx(agavePermission);
+          return pems;
+        };
+
+        // permissions for all group/users
+        FileItem.prototype.agaveFilePermissions = function (agavePermission, username) {
+          var that = this;
+          that.inprocess = true;
+
+          FilesController.listFileItemPermissions(that.model.system.id, 99999, 0, that.model.fullPath())
+            .then(function(response){
+              angular.forEach(response, function(pem) {
+                that.model.perms[pem.username] = pem.permission;
+                that.model.recursive = pem.recursive;
+                that.tempModel.recursive = pem.recursive;
+                that.model.perms[pem.username].recursive = pem.recursive;
+                that.tempModel.perms[pem.username] = angular.copy(that.model.perms[pem.username]);
+              });
+              that.inprocess = false;
+            })
+            .catch(function(response){
+              that.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+              that.inprocess = false;
+            })
+        };
+
+        FileItem.prototype.changePermission = function(pem, username){
+          var self = this;
+          var deferred = $q.defer();
+          var newPem = new FilePermissionRequest();
+
+          newPem.setUsername(username);
+          newPem.setPermission(self.transformRwxToAgave(pem));
+          newPem.setRecursive(self.tempModel.type === 'file' && pem.recursive);
+
+          self.inprocess = true;
+          self.error = '';
+
+          var path = self.model.path.join('/') + '/' + self.model.name;
+
+          FilesController.updateFileItemPermission(newPem, this.model.system.id, path )
+              .then(
+                function(data) {
+                  self.deferredHandler(data, deferred);
+              }, function(data) {
+                self.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+              })
+              ['finally'](function (data) {
+                self.inprocess = false;
+              });
+
+
+          return deferred.promise;
+        };
+
+        FileItem.prototype.changePermissions = function() {
+          var self = this;
+          var promises = [];
+
+          angular.forEach(self.tempModel.perms, function(pem, username){
+            if (JSON.stringify(self.model.perms[username]) !== JSON.stringify(self.tempModel.perms[username])) {
+              promises.push(self.changePermission(pem, username));
+            }
+          });
+
+          var deferred = $q.defer();
+
+          return $q.all(promises)
+            .then(
+              function(data) {
+                self.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+                return deferred.promise;
+            })
+            .catch(function(data){
+                self.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+                return deferred.promise;
+            });
         };
 
         FileItem.prototype.update = function() {
