@@ -168,7 +168,7 @@
               that.inprocess = false;
             })
             .catch(function(response){
-              that.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+              that.deferredHandler(response, deferred, $translate.instant('error_changing_perms'));
               that.inprocess = false;
             })
         };
