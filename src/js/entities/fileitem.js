@@ -152,27 +152,28 @@
         };
 
         // permissions for all group/users
-        FileItem.prototype.agaveFilePermissions = function (agavePermission, username) {
-          var that = this;
-          that.inprocess = true;
+       FileItem.prototype.agaveFilePermissions = function (agavePermission, username) {
+          var self = this;
+          self.inprocess = true;
+          var deferred = $q.defer();
 
-          FilesController.listFileItemPermissions(that.model.system.id, 99999, 0, that.model.fullPath())
-            .then(function(response){
-              angular.forEach(response, function(pem) {
-                that.model.perms[pem.username] = pem.permission;
-                that.model.recursive = pem.recursive;
-                that.tempModel.recursive = pem.recursive;
-                that.model.perms[pem.username].recursive = pem.recursive;
-                that.tempModel.perms[pem.username] = angular.copy(that.model.perms[pem.username]);
+          FilesController.listFileItemPermissions(self.model.system.id, 99999, 0, self.model.fullPath())
+            .then(function(data){
+              angular.forEach(data, function(pem) {
+                self.model.perms[pem.username] = pem.permission;
+                self.model.recursive = pem.recursive;
+                self.tempModel.recursive = pem.recursive;
+                self.model.perms[pem.username].recursive = pem.recursive;
+                self.tempModel.perms[pem.username] = angular.copy(self.model.perms[pem.username]);
               });
-              that.inprocess = false;
+              self.inprocess = false;
             })
-            .catch(function(response){
-              that.deferredHandler(response, deferred, $translate.instant('error_changing_perms'));
-              that.inprocess = false;
+            .catch(function(data){
+              self.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
+              self.inprocess = false;
             })
         };
-
+        
         FileItem.prototype.changePermission = function(pem, username){
           var self = this;
           var deferred = $q.defer();
