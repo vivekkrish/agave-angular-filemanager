@@ -83,7 +83,7 @@
               deferredHandler(data, deferred);
             },
             function(data) {
-              deferredHandler(data, deferred, 'Error uploading files');
+              deferredHandler(data, deferred, $translate.instant('error_uploading_files'));
           })
           ['finally'](function (data) {
             self.requesting = false;
@@ -134,7 +134,7 @@
               deferredHandler(data, deferred);
             },
             function(data) {
-              deferredHandler(data, deferred, 'Error downloading files');
+              deferredHandler(data, deferred, $translate.instant('error_dowwnloading_files'));
           });
         };
 

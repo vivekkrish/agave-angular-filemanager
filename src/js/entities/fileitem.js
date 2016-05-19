@@ -173,7 +173,7 @@
               self.inprocess = false;
             })
         };
-        
+
         FileItem.prototype.changePermission = function(pem, username){
           var self = this;
           var deferred = $q.defer();
@@ -448,36 +448,116 @@
             var self = this;
             var deferred = $q.defer();
 
-            var data = {
-                force: "true"
-            };
+            self.inprocess = true;
+            self.error = '';
 
-            // can't force auth through a separate window, so we create a postit
-            // and use that to force the download
-            var postitIt = new PostItRequest();
-            postitIt.setMaxUses(2);
-            postitIt.setMethod("GET");
-            postitIt.setUrl([self.model._links.self.href, $.param(data)].join('?'));
+            if (preview === true){
+              if (self.tempModel.preview){
+                self.tempModel.preview = {};
+              }
 
-            PostitsController.addPostit(postitIt)
-                .then(function(data) {
-                    if (self.model.type !== 'dir') {
-                        window.open(data._links.self.href, '_blank', '');
-                    }
-                    self.deferredHandler(data, deferred);
-                }, function(data) {
-                    self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
-                })['finally'](function() {
-                self.inprocess = false;
-            });
+              if (self.isImage()){
+                var data = {
+                    force: "true"
+                };
+
+                var postitIt = new PostItRequest();
+                postitIt.setMaxUses(2);
+                postitIt.setMethod("GET");
+                postitIt.setUrl([self.model._links.self.href, $.param(data)].join('?'));
+
+                PostitsController.addPostit(postitIt)
+                    .then(function(data) {
+                      self.tempModel.preview = {};
+                      self.tempModel.preview.isImage = true;
+                      self.tempModel.preview.url = data._links.self.href;
+                      self.deferredHandler(data, deferred);
+                    }, function(data){
+                      self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
+                    })['finally'](function() {
+                      self.inprocess = false;
+                    });
+              } else {
+                var filePath = $localStorage.tenant.baseUrl + 'files/v2/media/system/' + self.model.system.id + self.model.fullPath();
+
+                $http({
+                     method: 'GET',
+                     url: filePath,
+                     responseType: 'arraybuffer',
+                     cache: false,
+                     headers: {
+                       'Authorization': 'Bearer ' + $localStorage.token.access_token
+                     }
+                 }).success(function(data){
+                   self.tempModel.preview = {};
+                   if (self.isPdf()){
+                     self.tempModel.preview.isPdf = true;
+                     self.tempModel.preview.data = URL.createObjectURL(new Blob([data], {type: 'application/pdf'}));
+                   } else {
+                     self.tempModel.preview.isText = true;
+                     self.tempModel.preview.data = URL.createObjectURL(new Blob([data]));
+                   }
+                   self.inprocess = false;
+                   self.deferredHandler(data, deferred, data.message);
+                 }).error(function(data){
+                   self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
+                   self.inprocess = false;
+                 });
+              }
+            } else {
+              var data = {
+                  force: "true"
+              };
+
+              var postitIt = new PostItRequest();
+              postitIt.setMaxUses(2);
+              postitIt.setMethod("GET");
+              postitIt.setUrl([self.model._links.self.href, $.param(data)].join('?'));
+
+              PostitsController.addPostit(postitIt)
+                  .then(function(data) {
+                      if (self.model.type !== 'dir') {
+                        self.tempModel.preview.isPdf = self.isPdf();
+                        self.tempModel.preview.isImage = self.isImage();
+                        self.tempModel.preview.isText = self.isText();
+
+                        var link = document.createElement('a');
+                        link.setAttribute('download', null);
+                        link.setAttribute('href', data._links.self.href);
+                        link.style.display = 'none';
+
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }
+                      self.deferredHandler(data, deferred);
+                  }, function(data){
+                      self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
+                  })['finally'](function() {
+                    self.inprocess = false;
+                  });
+            }
+
+            return deferred.promise;
         };
 
-        FileItem.prototype.preview = function() {
+         FileItem.prototype.preview = function() {
             var self = this;
-            return self.download(true);
+            var deferred = $q.defer();
+
+            self.download(true)
+              .then(
+                function(data){
+                  self.deferredHandler(data, deferred);
+                },
+                function(data){
+                  self.deferredHandler(data, deferred, $translate.instant('error_displaying'));
+                });
+
+            return  deferred.promise;
         };
 
-        FileItem.prototype.getContent = function() {
+         FileItem.prototype.getContent = function() {
             var self = this;
             var deferred = $q.defer();
 
@@ -485,11 +565,16 @@
             self.error = '';
             FilesController.getDownloadFileItem(self.tempModel.fullPath(), self.model.system.id, false)
                 .then(function(data) {
+                    if (typeof self.tempModel.preview === 'undefined'){
+                      self.tempModel.preview = {};
+                    }
                     if (angular.isObject(data)) {
                         self.tempModel.content = self.model.content = JSON.stringify(data, null, 2);
                     } else {
                         self.tempModel.content = self.model.content = data;
                     }
+
+                    self.tempModel.preview.isEdit = true;
                     self.deferredHandler({ result: self.tempModel.content }, deferred);
                 }, function(data) {
                     self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
@@ -497,21 +582,6 @@
                     self.inprocess = false;
                 });
 
-            //var data = {params: {
-            //    mode: "editfile",
-            //    path: self.tempModel.fullPath()
-            //}};
-
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.getContentUrl, data).then(function(data) {
-            //    self.tempModel.content = self.model.content = data.result;
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
@@ -531,57 +601,42 @@
                     self.inprocess = false;
                 });
 
-            //var data = {params: {
-            //    mode: "delete",
-            //    path: self.tempModel.fullPath()
-            //}};
-
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.removeUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_deleting'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
-        FileItem.prototype.edit = function() {
+        FileItem.prototype.editSave = function() {
             var self = this;
             var deferred = $q.defer();
-
             self.inprocess = true;
-            self.error = '';
-            FilesController.uploadBlob(self.tempMode.content, self.tempMode.name, self.tempMode.path.join('/'), false)
-                .then(function(data) {
 
-                    self.deferredHandler(data, deferred);
-                }, function(data) {
-                    self.deferredHandler(data, deferred, $translate.instant('error_saving_content'));
-                })['finally'](function(data) {
-                    self.inprocess = false;
-                });
+            var filePath = Configuration.BASEURI + 'files/v2/media/system/' + self.tempModel.system.id + '/' + self.tempModel.path.join('/') + "?naked=true";
+            var blob = new Blob([self.tempModel.content], {type: "text/plain"})
+            var file = new File([blob], self.tempModel.name, {type: "text/plain"});
 
-
-            //var data = {params: {
-            //    mode: "savefile",
-            //    content: self.tempModel.content,
-            //    path: self.tempModel.fullPath()
-            //}};
-            //
-            //self.inprocess = true;
-            //self.error = '';
-            //
-            //$http.post(fileManagerConfig.editUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_modifying'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
+            Upload.upload({
+                url: filePath,
+                // data: formData,
+                data: {
+                  file: file,
+                  fileToUpload: file,
+                  append: false,
+                  fileType: 'raw'
+                },
+                method: 'POST',
+                headers: {
+                  "Content-Type": undefined,
+                  "Authorization": "Bearer " + Configuration.oAuthAccessToken
+                }
+            }).then(
+              function (data) {
+                self.deferredHandler(data, deferred);
+            }, function (data) {
+                self.deferredHandler(data, deferred, $translate.instant('error_saving'));
+            })['finally'](function (data) {
+                self.inprocess = false;
+            });
             return deferred.promise;
+
         };
 
         FileItem.prototype.fetchPermissions = function() {
@@ -622,30 +677,17 @@
                     self.inprocess = false;
                 });
 
-            //
-            //var data = {params: {
-            //    mode: "changepermissions",
-            //    path: self.tempModel.fullPath(),
-            //    perms: self.tempModel.perms.toOctal(),
-            //    permsCode: self.tempModel.perms.toCode(),
-            //    recursive: self.tempModel.recursive
-            //}};
-
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.permissionsUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_changing_perms'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
         FileItem.prototype.isFolder = function() {
             return this.model.type === 'dir';
         };
+
+        FileItem.prototype.isPreviewable = function() {
+           return !this.isFolder() && fileManagerConfig.isPreviewableFilePattern.test(this.model.name);
+        };
+
 
         FileItem.prototype.isEditable = function() {
             return !this.isFolder() && fileManagerConfig.isEditableFilePattern.test(this.model.name);
@@ -661,6 +703,14 @@
 
         FileItem.prototype.isExtractable = function() {
             return !this.isFolder() && fileManagerConfig.isExtractableFilePattern.test(this.model.name);
+        };
+
+        FileItem.prototype.isPdf = function(){
+            return !this.isFolder() && fileManagerConfig.isPdfFilePattern.test(this.model.name);
+        };
+
+        FileItem.prototype.isText = function(){
+            return !this.isFolder() && fileManagerConfig.isTextFilePattern.test(this.model.name);
         };
 
         return FileItem;

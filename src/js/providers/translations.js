@@ -64,10 +64,12 @@
             error_invalid_filename: "Invalid filename or already exists, specify another name",
             error_modifying: "An error occurred modifying the file",
             error_deleting: "An error occurred deleting the file or folder",
+            error_displaying: "An error occurred displaying the file",
             error_renaming: "An error occurred renaming the file",
             error_copying: "An error occurred copying the file",
             error_compressing: "An error occurred compressing the file or folder",
             error_extracting: "An error occurred extracting the file",
+            error_saving: "An error ocurred saving the file",
             error_creating_folder: "An error occurred creating the folder",
             error_getting_content: "An error occurred getting the content of the file",
             error_changing_perms: "An error occurred changing the permissions of the file",
@@ -85,7 +87,11 @@
             original: "Original",
             changes: "Changes",
             recursive: "Recursive",
-            user: "User"
+            user: "User",
+            preview: "Preview",
+            previewing: "Previewing",
+            editing: "Editing",
+            save: "Save"
         });
 
         $translateProvider.translations('pt', {

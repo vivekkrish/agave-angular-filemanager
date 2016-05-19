@@ -87,16 +87,9 @@
                   });
               }
             } else {
-              if (item.isImage()) {
-                  return item.preview();
-              }
-              if (item.isEditable()) {
-                  item.getContent();
-                  $scope.cmMode = $filter('codeMirrorEditorMode')(item.model.name);
-
-                  $scope.touch(item);
-                  return $scope.modal('edit');
-              }
+              item.preview();
+              $scope.temp = item;
+              return $scope.modal('preview');
             }
         };
 
@@ -110,9 +103,24 @@
             return currentPath.indexOf(path) !== -1;
         };
 
-        $scope.edit = function(item) {
-            item.edit().then(function() {
-                $scope.modal('edit', true);
+        // TO-DO: make this work property with codemirror
+        // $scope.edit = function(item){
+        //   var self = item;
+        //   item.getContent()
+        //     .then(
+        //       function(data){
+        //         self.tempModel.preview.isText = false;
+        //         $scope.temp = self;
+        //         return $scope.modal('preview');
+        //       },
+        //       function(data){
+        //       });
+        // };
+
+        $scope.editSave = function(item) {
+            item.editSave().then(function() {
+                $scope.modal('preview', true);
+                $scope.fileNavigator.refresh();
             });
         };
 
@@ -225,6 +233,17 @@
           } else {
             $scope.fileNavigator.fileListSelected = [];
           }
+        }
+
+        $scope.download = function(item){
+          item.download().then(
+            function(data){
+              $scope.modal('preview', true);
+            },
+            function(data){
+              var errorMsg = data.result && data.result.error || $translate.instant('error_downloading_files');
+              $scope.temp.error = errorMsg;
+            });
         }
 
         $scope.downloadFiles = function(fileListSelected){
