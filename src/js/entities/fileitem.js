@@ -1,7 +1,7 @@
 (function(window, angular, $) {
     "use strict";
-    angular.module('FileManagerApp').factory('fileItem', ['$http', '$q', '$translate', '$localStorage', 'fileManagerConfig', 'AccessControlList', 'FilesController', 'FileManagementActionTypeEnum', 'PostitsController', 'TransformsController',
-        function($http, $q, $translate, $localStorage, fileManagerConfig, AccessControlList, FilesController, FileManagementActionTypeEnum, PostitsController, TransformsController) {
+    angular.module('FileManagerApp').factory('fileItem', ['$http', '$q', '$translate', '$localStorage', 'fileManagerConfig', 'AccessControlList', 'FilesController', 'FileManagementActionTypeEnum', 'PostitsController', 'TransformsController', 'Configuration', 'Upload',
+        function($http, $q, $translate, $localStorage, fileManagerConfig, AccessControlList, FilesController, FileManagementActionTypeEnum, PostitsController, TransformsController, Configuration, Upload) {
 
         var FileItem = function(model, path, system) {
             var rawModel = {
@@ -274,21 +274,6 @@
                     self.inprocess = false;
                 });
 
-            //var data = {params: {
-            //    mode: "addfolder",
-            //    path: self.tempModel.path.join('/'),
-            //    name: self.tempModel.name
-            //}};
-
-            //$http.post(fileManagerConfig.createFolderUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_creating_folder'));
-            //})['finally'](function(data) {
-            //    self.inprocess = false;
-            //});
-
-
             return deferred.promise;
         };
 
@@ -311,20 +296,6 @@
                     self.inprocess = false;
                 });
 
-            //var data = {params: {
-            //    "mode": "rename",
-            //    "path": self.model.fullPath(),
-            //    "newPath": self.tempModel.fullPath()
-            //}};
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.renameUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_renaming'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
@@ -346,22 +317,6 @@
                 })['finally'](function(data) {
                 self.inprocess = false;
             });
-
-            //var data = {params: {
-            //    mode: "copy",
-            //    path: self.model.fullPath(),
-            //    newPath: self.tempModel.fullPath()
-            //}};
-            //
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.copyUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_copying'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
@@ -386,21 +341,6 @@
                     self.inprocess = false;
                 });
 
-            //var data = {params: {
-            //    mode: "compress",
-            //    path: self.model.fullPath(),
-            //    destination: self.tempModel.fullPath()
-            //}};
-            //
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.compressUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_compressing'));
-            //})['finally'](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
@@ -424,23 +364,6 @@
                 })["finally"](function() {
                     self.inprocess = false;
                 });
-
-            //var data = {params: {
-            //    mode: "extract",
-            //    path: self.model.fullPath(),
-            //    sourceFile: self.model.fullPath(),
-            //    destination: self.tempModel.fullPath()
-            //}};
-            //
-            //self.inprocess = true;
-            //self.error = '';
-            //$http.post(fileManagerConfig.extractUrl, data).then(function(data) {
-            //    self.deferredHandler(data, deferred);
-            //}, function(data) {
-            //    self.deferredHandler(data, deferred, $translate.instant('error_extracting'));
-            //})["finally"](function() {
-            //    self.inprocess = false;
-            //});
             return deferred.promise;
         };
 
@@ -471,6 +394,7 @@
                       self.tempModel.preview = {};
                       self.tempModel.preview.isImage = true;
                       self.tempModel.preview.url = data._links.self.href;
+                      self.tempModel.preview.isPreviewable = self.isPreviewable();
                       self.deferredHandler(data, deferred);
                     }, function(data){
                       self.deferredHandler(data, deferred, $translate.instant('error_getting_content'));
@@ -497,6 +421,7 @@
                      self.tempModel.preview.isText = true;
                      self.tempModel.preview.data = URL.createObjectURL(new Blob([data]));
                    }
+                   self.tempModel.preview.isPreviewable = self.isPreviewable();
                    self.inprocess = false;
                    self.deferredHandler(data, deferred, data.message);
                  }).error(function(data){
