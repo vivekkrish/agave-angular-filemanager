@@ -108,8 +108,9 @@
 <div class="modal animated fadeIn" id="postit">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form ng-submit="rename(temp)">
+            <form ng-submit="createPostit(temp)">
                 <div class="modal-header">
+                    <!-- temp-{{temp}} -->
                     <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">&times;</span>
                         <span class="sr-only">{{"close" | translate}}</span>
@@ -122,25 +123,33 @@
 
                     <label class="radio">Lifetime</label>
                     <div class="input-group">
-                        <!-- Input file -->
-                        <input type="number" min="1" class="form-control" ng-model="temp.postit.lifetime">
-                        <!-- System selection -->
-                        <div class="input-group-btn dropup">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
-                            </button>
-                            <ul class="data-system-list dropdown-menu" role="menu">
-                                <li><a href="#">Seconds</a></li>
-                                <li><a href="#">Minutes</a></li>
-                                <li><a href="#">Hours</a></li>
-                                <li><a href="#" class="active">Days</a></li>
-                            </ul>
+                     <input ng-model="temp.postit.lifetime" class="form-control" type="number">
+                     <div class="input-group-btn">
+                       <div class="dropdown">
+                         <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown"><span class="caret"></span> {{timeItem}}</button>
+                         <ul class="dropdown-menu">
+                           <li ng-repeat="timeItem in timeItems">
+                             <a href="#" ng-click="selectTime(timeItem)">{{timeItem}}</a>
+                           </li>
+                         </ul>
+                       </div>
+                     </div>
+                   </div>
+                    <div class="panel panel-primary mt10 mb0">
+                        <div class="panel-body">
+                            <div class="detail-sources">
+                                <code class="mr5"><b>{{"source" | translate}}:</b> {{temp.tempModel._links.self.href}}</code>
+                            </div>
                         </div>
-                        <!-- /btn-group -->
-
                     </div>
-                    <!-- /input-group -->
+                    <div class="panel panel-primary mt10 mb0 text-center" ng-show="temp.postit.link">
+                        <div class="panel-body">
+                          <div class="detail-sources">
+                              <code><a ng-href="{{temp.postit.link}}" target="_blank" class="mr5"> {{temp.postit.link}}</a></code>
+                          </div>
 
-                    <div ng-include data-src="'postit-bar'" class="clearfix"></div>
+                        </div>
+                    </div>
                     <div ng-include data-src="'error-bar'" class="clearfix"></div>
                 </div>
                 <div class="modal-footer">
@@ -515,7 +524,7 @@
         </div>
         <div class="detail-sources">
           <code class="mr5"><b>{{"destination" | translate}}:</b>{{temp.tempModel.fullPath()}}</code>
-          <a href="" class="label label-primary" ng-click="openNavigator(temp)">{{'change' | translate}}</a>
+          <a href="" class="label label-primary" ng-click="$root.openNavigator(temp)">{{'change' | translate}}</a>
         </div>
     </div>
   </div>
@@ -524,20 +533,6 @@
     <div class="label label-danger error-msg pull-left animated fadeIn" ng-show="temp.error">
       <i class="glyphicon glyphicon-remove-circle"></i>
       <span>{{temp.error}}</span>
-    </div>
-</script>
-
-<script type="text/ng-template" id="postit-bar">
-    <div class="panel panel-primary mt10 mb0">
-        <div class="panel-body">
-            <div class="detail-sources">
-                <code class="mr5"><b>{{"source" | translate}}:</b> {{temp.tempModel._links.self.href}}</code>
-            </div>
-            <div class="detail-sources">
-                <code class="mr5"><b>PostIt URL:</b>{{postit._links.self.href}}</code>
-                <a href="" class="label label-primary" ng-click="openNavigator(temp)">{{'change' | translate}}</a>
-            </div>
-        </div>
     </div>
 </script>
 

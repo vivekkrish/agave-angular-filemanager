@@ -90,23 +90,7 @@
                     })['finally'](function (data) {
                     self.requesting = false;
                 });
-                //var data = {params: {
-                //    mode: "list",
-                //    onlyFolders: false,
-                //    path: '/' + path
-                //}};
-                //
-                //self.requesting = true;
-                //self.fileList = [];
-                //self.error = '';
-                //
-                //$http.post(fileManagerConfig.listUrl, data).success(function(data) {
-                //    self.deferredHandler(data, deferred);
-                //}).error(function(data) {
-                //    self.deferredHandler(data, deferred, 'Unknown error listing, check the response');
-                //})['finally'](function(data) {
-                //    self.requesting = false;
-                //});
+
                 return deferred.promise;
             }
         };
@@ -129,6 +113,21 @@
                       self.crumbsPath = self.currentPath;
                   }
                 }
+
+                 // prepend root folder to fileList
+                var rootItem = new fileItem();
+                if (typeof self.fileList[0] !== 'undefined'){
+                  angular.copy(self.fileList[0], rootItem);
+                } else {
+                  rootItem.model.path = self.currentPath;
+                }
+                rootItem.model.name = self.currentPath.length === 0 ? '' : self.currentPath[self.currentPath.length-1];
+                rootItem.model.fileType = 'folder';
+                rootItem.model.type = 'dir';
+                rootItem.model.root = true;
+                rootItem.tempModel = rootItem.model;
+                self.fileList.unshift(rootItem);
+
                 self.buildTree(path);
             });
         };
@@ -172,34 +171,14 @@
             }
         };
 
-        //  FileNavigator.prototype.sidebarFolderClick = function(item) {
-        //     var self = this;
-        //     if (typeof item.item === 'undefined'){
-        //       self.currentPath = [];
-        //       self.currentPath.push(item.item.name);
-        //     } else {
-        //
-        //       self.currentPath = [];
-        //       if (item && item.item.isFolder()) {
-        //           self.currentPath = item.item.model.fullPath().split('/').splice(1);
-        //           self.crumbsPath = item.item.model.crumbsPath().splice(1);
-        //       }
-        //     }
-        //
-        //     self.refresh();
-        // };
-
         FileNavigator.prototype.folderClick = function(item) {
             var self = this;
-            if (typeof item === 'undefined'){
-              self.currentPath = [];
-              self.currentPath.push(item.name);
-            } else {
-
-              self.currentPath = [];
-              if (item && item.isFolder()) {
-                  self.currentPath = item.model.fullPath().split('/').splice(1);
-                  self.crumbsPath = item.model.crumbsPath().splice(1);
+            if (item && item.isFolder()) {
+             // update if not root dir
+             if (typeof item.model.root === 'undefined'){
+                 self.currentPath = [];
+                 self.currentPath = item.model.fullPath().split('/').splice(1);
+                 self.crumbsPath = item.model.crumbsPath().splice(1);
               }
             }
 

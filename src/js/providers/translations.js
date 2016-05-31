@@ -91,7 +91,8 @@
             preview: "Preview",
             previewing: "Previewing",
             editing: "Editing",
-            save: "Save"
+            save: "Save",
+            postit: "Postit"
         });
 
         $translateProvider.translations('pt', {

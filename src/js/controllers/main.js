@@ -188,6 +188,21 @@
             });
         };
 
+        // postits
+        $scope.timeItem = '';
+        $scope.timeItems = ['seconds', 'minutes', 'hours', 'days'];
+        $scope.selectTime = function(time){
+          $scope.timeItem = time;
+        }
+        $scope.createPostit = function(item){
+          item.createPostit($scope.timeItem)
+          .then(
+            function(data){
+            },
+            function(data){
+            });
+        }
+
         $scope.createFolder = function(item) {
             var name = item.tempModel.name && item.tempModel.name.trim();
             item.tempModel.type = 'dir';
