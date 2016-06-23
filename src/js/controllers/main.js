@@ -294,6 +294,10 @@
             return found;
         };
 
+        $scope.selectItem = function(item){
+          $rootScope.uploadFileContent = 'agave://' + item.model.system.id + item.model.fullPath();
+        }
+
         $scope.changeLanguage($scope.getQueryParam('lang'));
         $scope.isWindows = $scope.getQueryParam('server') === 'Windows';
 
