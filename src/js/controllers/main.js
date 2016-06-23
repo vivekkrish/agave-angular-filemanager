@@ -70,7 +70,7 @@
                 return $scope.fileNavigator.folderClick(item);
             }
 
-            if ($scope.config.allowedActions.agaveUpload === "true"){
+            if ($scope.config.allowedActions.agaveUpload === true){
               if (item.isImage()) {
                   // TO-DO: handle error message
               }
@@ -86,6 +86,8 @@
                       $scope.temp.error = errorMsg;
                   });
               }
+            } else if ($scope.config.allowedActions.agaveSelect === true){
+                $rootScope.uploadFileContent = 'agave://' + item.model.system.id + item.model.fullPath();
             } else {
               item.preview();
               $scope.temp = item;
@@ -300,7 +302,7 @@
         }
 
         $rootScope.$on('af:directory-change', function(event, systemId, newPath) {
-          if ($scope.config.allowedActions.agaveUpload === "false"){
+          if ($scope.config.allowedActions.agaveUpload === false && $scope.config.allowedActions.agaveSelect === false){
             if (newPath) {
                 $scope.$parent.$parent.$state.transitionTo(
                     'data-explorer',
@@ -312,7 +314,6 @@
 
         $scope.$watch('$parent.$parent.system', function(val) {
             $scope.system = val;
-
             $scope.fileNavigator = new FileNavigator($scope.system, $scope.$parent.$parent.path);
             $scope.fileNavigator.refresh();
         });

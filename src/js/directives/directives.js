@@ -8,10 +8,12 @@
             templateUrl: fileManagerConfig.tplPath + '/main.html',
             scope: {
                 system: "=agaveSystem",
-                upload: "=agaveUpload"
+                upload: "=agaveUpload",
+                select: "=agaveSelect"
             },
             link: function (scope, element, attrs){
-              fileManagerConfig.allowedActions.agaveUpload = attrs.agaveUpload;
+              fileManagerConfig.allowedActions.agaveUpload = (typeof attrs.agaveUpload === 'undefined') ? false : true;
+              fileManagerConfig.allowedActions.agaveSelect = (typeof attrs.agaveSelect === 'undefined') ? false : true;
             }
         };
     }]);
