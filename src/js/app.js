@@ -26,12 +26,12 @@
         $("#context-menu").hide();
     });
 
-    $(window.document).on('contextmenu', '.main-navigation .table-files td:nth-child(2), .iconset a.thumbnail', function(e) {
-        var clickPosition = $(this).position();
-        console.log("right click context menu at: " + clickPosition.x + ',' + clickPosition.y);
+    $(window.document).on('contextmenu', '.main-navigation .table-files tr, .iconset a.thumbnail', function(e) {
+        var posX = $(this).position().left,
+            posY = $(this).position().top;
         $("#context-menu").hide().css({
-            left: clickPosition.left, //.pageX,
-            top: clickPosition.top + 20 //.pageY
+            left: posX + 100, //.pageX,
+            top: posY - 200 //.pageY
         }).show();
         e.preventDefault();
     });
