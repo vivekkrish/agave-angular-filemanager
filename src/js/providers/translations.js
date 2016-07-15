@@ -76,6 +76,7 @@
             error_uploading_files: "An error occurred uploading files",
             error_downloading_files: "An error occurred downloading files",
             error_deleting_files: "An error occurred deleting files",
+            error_notifications_files: "An error ocurred trying to get file notifications",
             sure_to_start_compression_with: "Are you sure to compress",
             owner: "Owner",
             group: "Group",
@@ -92,7 +93,8 @@
             previewing: "Previewing",
             editing: "Editing",
             save: "Save",
-            postit: "Postit"
+            postit: "Postit",
+            notifications: "Notifications"
         });
 
         $translateProvider.translations('pt', {

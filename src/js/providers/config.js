@@ -33,7 +33,8 @@
                 preview: true,
                 remove: true,
                 postits: true,
-                publish: false
+                publish: false,
+                notifications: true
             },
 
             enablePermissionsRecursive: true,
