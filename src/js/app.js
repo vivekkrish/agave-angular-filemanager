@@ -22,10 +22,6 @@
         }.bind(this), 100);
     });
 
-    $('body').on('hidden.bs.modal', '.modal', function () {
-        $(this).removeData('bs.modal');
-    });
-
     $(window.document).on('click', function() {
         $("#context-menu").hide();
     });
