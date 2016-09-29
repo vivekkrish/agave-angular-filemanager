@@ -73,18 +73,16 @@
               if (item.isImage()) {
                   // TO-DO: handle error message
               }
-              if (item.isEditable()) {
-                  $scope.fileNavigator.requesting = true;
-                  item.getContent().then(
-                    function(response){
-                      $rootScope.uploadFileContent = response.result;
-                      $scope.fileNavigator.requesting = false;
-                    },
-                    function(response) {
-                      var errorMsg = response.result && response.result.error || $translate.instant('error_uploading_files');
-                      $scope.temp.error = errorMsg;
-                  });
-              }
+              $scope.fileNavigator.requesting = true;
+              item.getContent().then(
+                function(response){
+                  $rootScope.uploadFileContent = response.result;
+                  $scope.fileNavigator.requesting = false;
+                },
+                function(response) {
+                  var errorMsg = response.result && response.result.error || $translate.instant('error_uploading_files');
+                  $scope.temp.error = errorMsg;
+              });
             } else if ($scope.config.allowedActions.agaveSelect === true){
                 $rootScope.uploadFileContent = 'agave://' + item.model.system.id + item.model.fullPath();
             } else {
@@ -134,11 +132,11 @@
             );
         };
 
-        // Populate systems for copy modal
+        // Populate systems in copy mod
         $scope.getCopySystems = function(){
           SystemsController.listSystems(99999).then(
             function (response) {
-              $scope.copySystems = response;
+              $scope.copySystems = response.result;
             }
           );
         }

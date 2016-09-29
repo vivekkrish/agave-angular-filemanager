@@ -40,7 +40,7 @@
             enablePermissionsRecursive: true,
             compressAsync: true,
             extractAsync: true,
-            isEditableFilePattern: /\.(txt|html?|aspx?|ini|pl|py|md|css|js|log|htaccess|htpasswd|json|sql|xml|xslt?|sh|rb|as|bat|cmd|coffee|php[3-6]?|java|c|cbl|go|h|scala|vb|md|err|out|scala|groovy|zsh|csh)$/i,
+            isEditableFilePattern: /\.(txt|html?|aspx?|ini|pl|py|md|css|js|log|htaccess|htpasswd|json|sql|xml|xslt?|sh|rb|as|bat|cmd|coffee|php[3-6]?|java|c|cbl|go|h|scala|vb|md|err|out|scala|groovy|zsh|csh|pub)$/i,
             isPreviewableFilePattern: /\.(txt|html?|aspx?|ini|pl|py|md|css|js|log|htaccess|htpasswd|json|sql|xml|xslt?|sh|rb|as|bat|cmd|coffee|php[3-6]?|java|c|cbl|go|h|scala|vb|md|err|out|scala|groovy|zsh|csh|jpe?g|gif|bmp|png|pdf|svg|tiff?)$/i,
             isTextFilePattern: /\.(json|err|out|m|tex|sh|log|txt|tcl)$/i,
             isImageFilePattern: /\.(jpe?g|gif|bmp|png|svg|tiff?)$/i,
