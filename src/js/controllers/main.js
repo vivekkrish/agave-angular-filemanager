@@ -132,6 +132,10 @@
             );
         };
 
+        $scope.editPermissions = function(item){
+          item.editPermissions(item);
+        }
+
         // Populate systems in copy mod
         $scope.getCopySystems = function(){
           SystemsController.listSystems(99999).then(
