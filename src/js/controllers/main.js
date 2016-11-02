@@ -94,7 +94,7 @@
 
 
         $scope.modal = function(id, hide) {
-            $('#' + id).modal(hide ? 'hide' : 'show')
+            $('#' + id).uibModal(hide ? 'hide' : 'show')
         };
 
         $scope.isInThisPath = function(path) {
