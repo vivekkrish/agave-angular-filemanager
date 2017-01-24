@@ -28,7 +28,7 @@
                 changePermissions: true,
                 compress: true,
                 compressChooseName: true,
-                extract: true,
+                extract: false,
                 download: true,
                 preview: true,
                 remove: true,
