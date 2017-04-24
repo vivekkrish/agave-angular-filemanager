@@ -19,6 +19,7 @@
             extractUrl: "",
             permissionsUrl: "",
 
+            layout: 'boxed', // fluid or boxed
             sidebar: true,
             breadcrumb: true,
             allowedActions: {
@@ -47,7 +48,7 @@
             isExtractableFilePattern: /\.(gz|tar|rar|g?zip)$/i,
             isPdfFilePattern: /\.pdf$/i,
 
-            tplPath: '../bower_components/angular-filebrowser/src/templates'
+            tplPath: 'src/templates'
         };
 
         return {

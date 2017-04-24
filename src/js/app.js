@@ -11,8 +11,15 @@
       'ngCookies',
       'ngFileUpload',
       'checklist-model',
-      'schemaForm',
-      'AgavePlatformScienceAPILib']);
+      'oc.lazyLoad',
+      'ui.bootstrap',
+      // 'schemaForm',
+      'angularMoment',
+      'ui.router',
+      'ngSanitize',
+      'ngStorage',
+      'AgavePlatformScienceAPILib'
+    ]);
 
     /**
      * jQuery inits

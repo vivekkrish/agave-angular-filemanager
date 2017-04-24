@@ -1,13 +1,14 @@
 (function(window, angular, $) {
     "use strict";
     angular.module('FileManagerApp').controller('FileManagerCtrl', [
-    '$scope', '$rootScope', '$translate', '$cookies', '$filter', '$ocLazyLoad', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'Commons', 'SystemsController',
-        function($scope, $rootScope, $translate, $cookies, $filter, $ocLazyLoad, fileManagerConfig, fileItem, FileNavigator, FileUploader, Commons, SystemsController) {
+    '$scope', '$rootScope', '$translate', '$cookies', '$filter', '$ocLazyLoad', 'fileManagerConfig', 'fileItem', 'fileNavigator', 'fileUploader', 'SystemsController',
+        function($scope, $rootScope, $translate, $cookies, $filter, $ocLazyLoad, fileManagerConfig, fileItem, FileNavigator, FileUploader, SystemsController) {
         $scope.config = fileManagerConfig;
         $scope.appName = fileManagerConfig.appName;
         $scope.modes = ['Javascript', 'Shell', 'XML', 'Markdown', 'CLike', 'Python'];
         $scope.cmMode = '';
-
+        $scope.preserveDirectoryStructure = false;
+        
         $scope.cmOptions = {
             lineWrapping: true,
             lineNumbers: true,
@@ -138,7 +139,7 @@
 
         // Populate systems in copy mod
         $scope.getCopySystems = function(){
-          SystemsController.listSystems(99999).then(
+          SystemsController.searchSystems('limit=9999&filter=id,type,name').then(
             function (response) {
               $scope.copySystems = response.result;
             }
@@ -253,7 +254,7 @@
         };
 
         $scope.uploadFiles = function() {
-            $scope.fileUploader.upload($scope.uploadFileList, $scope.system, $scope.fileNavigator.currentPath).then(function() {
+            $scope.fileUploader.upload($scope.uploadFileList, $scope.system, $scope.fileNavigator.currentPath, $scope.preserveDirectoryStructure).then(function() {
                 $scope.fileNavigator.refresh();
                 $scope.uploadFileList = [];
                 $scope.modal('uploadfile', true);
@@ -329,7 +330,7 @@
         }
 
         $rootScope.$on('af:directory-change', function(event, systemId, newPath) {
-          if ($scope.config.allowedActions.agaveUpload === false && $scope.config.allowedActions.agaveSelect === false){
+          if ($scope.config.allowedActions.agaveUpload === false && $scope.config.allowedActions.agaveSelect === false && $scope.$parent.$parent.$state){
             if (newPath) {
                 $scope.$parent.$parent.$state.transitionTo(
                     'data-explorer',

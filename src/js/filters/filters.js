@@ -271,6 +271,79 @@
       var result = fileManagerConfig.useBinarySizePrefixes ? binaryByteUnits[i] : decimalByteUnits[i];
         return Math.max(fileSizeInBytes, 0.1).toFixed(1) + ' ' + result;
       };
-    }]);
+    }])
+    .filter('humanSize', function () {
+        return function (size, precision, plainText) {
+
+            if (precision === 0 || precision === null) {
+                precision = 1;
+            }
+            if (size === 0 || size === null) {
+                return "0B";
+            }
+            else if (!isNaN(size)) {
+                var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                var posttxt = 0;
+
+                if (size < 1024) {
+                    if (plainText) {
+                        return Number(size) + sizes[posttxt];
+                    } else {
+                        return Number(size) + '<font class="units">' + sizes[posttxt] + '</font>';
+                    }
+                }
+                while (size >= 1024) {
+                    posttxt++;
+                    size = size / 1024;
+                }
+
+                var power = Math.pow(10, precision);
+                var poweredVal = Math.ceil(size * power);
+
+                size = poweredVal / power;
+
+                if (plainText) {
+                    return size + sizes[posttxt];
+                } else {
+                    return size + '<font class="units">' + sizes[posttxt] + '</font>';
+                }
+            } else {
+                return "";
+            }
+
+        };
+    });
+
+    app.filter('humanReadableFileSize', ['$filter', 'fileManagerConfig', function($filter, fileManagerConfig) {
+        var decimalByteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+        var binaryByteUnits = ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+
+        return function(input) {
+            var i = -1;
+            var fileSizeInBytes = input;
+
+            do {
+                fileSizeInBytes = fileSizeInBytes / 1024;
+                i++;
+            } while (fileSizeInBytes > 1024);
+
+            var result = fileManagerConfig.useBinarySizePrefixes ? binaryByteUnits[i] : decimalByteUnits[i];
+            return Math.max(fileSizeInBytes, 0.1).toFixed(1) + ' ' + result;
+        };
+    }])
+
+    .filter('hasDirectories', function ($filter) {
+        return function (fileList) {
+            var hasDirectories = false;
+            angular.forEach(fileList, function(fileItem, iter) {
+                if (fileItem.path) {
+                    hasDirectories = true;
+                    return false;
+                }
+            });
+
+            return hasDirectories;
+        };
+    });
 
 })(angular);

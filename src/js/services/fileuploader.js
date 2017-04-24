@@ -45,6 +45,87 @@
         }
 
         this.requesting = false;
+        //
+        // this.createDirectoryTree = function(fileList, system, path) {
+        //   if (! window.FormData) {
+        //     throw new Error('Unsupported browser version');
+        //   }
+        //
+        //   var promises = [];
+        //   var totalCreated = 0;
+        //
+        //   // iterate through the files to find the list of maximum unique relative paths
+        //   // in the list. This is the fastest way to mirror the directory tree of the
+        //   // relative paths of the upload list.
+        //   var relativePaths = [];
+        //   var maxPaths = [];
+        //   angular.forEach(fileList, function (fileObj, key) {
+        //     var form = new window.FormData();
+        //
+        //     if (fileObj instanceof window.File && fileObj.path) {
+        //       relativePaths[fileObj.path] = 1;
+        //     }
+        //   });
+        //   console.log(_.keys(relativePaths));
+        //
+        //   _.sortBy(relativePaths, "key");
+        //
+        //   var uniqueRelativePaths = _.keys(relativePaths);
+        //
+        //   console.log(uniqueRelativePaths);
+        //
+        //   var uniqueLongestRelativePaths = [];
+        //
+        //   var len = uniqueRelativePaths.length;
+        //   var longestPrefix = '';
+        //   for (var i=len-1;i>0; i--) {
+        //     if (longestPrefix == '') {
+        //       longestPrefix = uniqueRelativePaths[i];
+        //     }
+        //     else if (!longestPrefix.startsWith(uniqueRelativePaths[i])) {
+        //       longestPrefix = uniqueRelativePaths[i];
+        //       uniqueLongestRelativePaths.push(longestPrefix);
+        //     }
+        //     else {
+        //       // ignore the prefix match. it's not a longest path.
+        //     }
+        //   }
+        //
+        //   console.log(uniqueLongestRelativePaths);
+        //
+        //   angular.forEach(uniqueLongestRelativePaths, function (relativeDirectoryPath, key) {
+        //
+        //     self.requesting = true;
+        //     var mkdirAction = new FileMkdirAction();
+        //     mkdirAction.setName(relativeDirectoryPath);
+        //
+        //     promises.push(
+        //       FilesController.updateInvokeFileItemAction(mkdirAction, systemId, path).then(
+        //         function(response) {
+        //           console.log("Successfully created " + relativeDirectoryPath);
+        //           console.log(response);
+        //           return response;
+        //         },
+        //         function(message) {
+        //           console.error("Failed to create remote directory at " + relativeDirectoryPath + ". " + message);
+        //           return message;
+        //         })
+        //     );
+        //   });
+        //
+        //   var deferred = $q.defer();
+        //
+        //   return $q.all(promises).then(
+        //       function(data) {
+        //         deferredHandler(data, deferred);
+        //       },
+        //       function(data) {
+        //         deferredHandler(data, deferred, $translate.instant('error_creating_directories'));
+        //       })
+        //       ['finally'](function (data) {
+        //     self.requesting = false;
+        //   });
+        // };
 
         this.upload = function(fileList, system, path) {
           if (! window.FormData) {
@@ -54,26 +135,57 @@
 
           var promises = [];
           var totalUploaded = 0;
+          var pathsCreated = [];
 
           angular.forEach(fileList, function (fileObj, key) {
 
             var form = new window.FormData();
 
             if (fileObj instanceof window.File) {
+              console.log("Preparing to upload " + (fileObj.path ? fileObj.path + "/" : "") + fileObj.name )
               form.append('fileToUpload', fileObj);
               form.append('append', false);
               form.append('fileType', 'raw');
+
+              self.requesting = true;
+
+              var filesUri = Configuration.BASEURI + 'files/v2/media/system/' + system.id + '/' + path.join('/');
+
+              // if ($scope.$parent.preserveDirectoryStructure && fileObj.path && !_.contains(pathsCreated, fileObj.path)) {
+              //   filesUri += "/" + fileObj.path + "?naked=true";
+              //
+              //   var mkdirAction = new FileMkdirAction();
+              //   mkdirAction.setName(fileObj.path);
+              //
+              //   promises.push(
+              //     FilesController.updateInvokeFileItemAction(mkdirAction, systemId, path).then(
+              //       function(response) {
+              //         console.log("Successfully created " + relativeDirectoryPath);
+              //         console.log(response);
+              //
+              //         // mark the directory as created
+              //         pathsCreated.push(fileObj.path);
+              //
+              //         self.uploadFile(fileObj, form, filesUri, function(value){
+              //           self.files.push(value);
+              //         });
+              //       },
+              //       function(message) {
+              //         console.error("Failed to create remote directory at " + relativeDirectoryPath + ". " + message);
+              //         return message;
+              //       })
+              //   );
+              // }
+              // else {
+                filesUri += "?naked=true";
+
+                promises.push(
+                    self.uploadFile(fileObj, form, filesUri, function (value) {
+                      self.files.push(value);
+                    })
+                );
+              // }
             }
-
-            self.requesting = true;
-
-            var filesUri = Configuration.BASEURI + 'files/v2/media/system/' + system.id + '/' + path.join('/') + "?naked=true";
-
-            promises.push(
-              self.uploadFile(fileObj, form, filesUri, function(value){
-                self.files.push(value);
-              })
-            );
           });
 
           var deferred = $q.defer();
