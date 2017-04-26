@@ -19,7 +19,7 @@
             extractUrl: "",
             permissionsUrl: "",
 
-            layout: 'boxed', // fluid or boxed
+            layout: 'fluid', // fluid or boxed
             sidebar: true,
             breadcrumb: true,
             allowedActions: {
@@ -27,7 +27,7 @@
                 copy: true,
                 edit: true,
                 changePermissions: true,
-                compress: true,
+                compress: false,
                 compressChooseName: true,
                 extract: false,
                 download: true,
